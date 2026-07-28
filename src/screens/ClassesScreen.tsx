@@ -10,25 +10,33 @@ import {
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
 import { mockClasses } from '../data/mockData';
 import { GymClass } from '../data/types';
+import { Card, Badge, EmptyState, ProgressBar } from '../components/UI';
 
-const days = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'];
+const days = [
+  { key: 'Segunda', short: 'SEG' },
+  { key: 'Terca', short: 'TER' },
+  { key: 'Quarta', short: 'QUA' },
+  { key: 'Quinta', short: 'QUI' },
+  { key: 'Sexta', short: 'SEX' },
+  { key: 'Sabado', short: 'SAB' },
+  { key: 'Domingo', short: 'DOM' },
+];
 
 export default function ClassesScreen() {
-  const [selectedDay, setSelectedDay] = useState<string>('Segunda');
-
+  const [selectedDay, setSelectedDay] = useState('Segunda');
   const filteredClasses = mockClasses.filter((c) => c.day === selectedDay);
 
   const handleEnroll = (cls: GymClass) => {
     if (cls.enrolled >= cls.capacity) {
-      Alert.alert('Turma Cheia', 'Nao ha vagas disponiveis.');
+      Alert.alert('Turma Lotada', 'Nao ha vagas disponiveis para esta aula.');
       return;
     }
     Alert.alert(
-      'Confirmar',
+      'Confirmar Inscrever',
       `Deseja se inscrever em ${cls.name}?`,
       [
         { text: 'Cancelar', style: 'cancel' },
-        { text: 'Confirmar', onPress: () => Alert.alert('Sucesso', 'Inscricao realizada!') },
+        { text: 'Confirmar', onPress: () => Alert.alert('Sucesso', 'Inscricao realizada com sucesso!') },
       ]
     );
   };
@@ -37,7 +45,7 @@ export default function ClassesScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Aulas</Text>
-        <Text style={styles.subtitle}>Agendamento de Aulas</Text>
+        <Text style={styles.subtitle}>Agendamento semanal</Text>
       </View>
 
       <ScrollView
@@ -46,72 +54,87 @@ export default function ClassesScreen() {
         style={styles.daysContainer}
         contentContainerStyle={styles.daysContent}
       >
-        {days.map((day) => (
-          <TouchableOpacity
-            key={day}
-            style={[styles.dayChip, selectedDay === day && styles.dayChipActive]}
-            onPress={() => setSelectedDay(day)}
-          >
-            <Text style={[styles.dayText, selectedDay === day && styles.dayTextActive]}>
-              {day}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      <ScrollView style={styles.classesList} showsVerticalScrollIndicator={false}>
-        {filteredClasses.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>📅</Text>
-            <Text style={styles.emptyText}>Nenhuma aula neste dia</Text>
-          </View>
-        ) : (
-          filteredClasses.map((cls) => (
-            <View key={cls.id} style={styles.classCard}>
-              <View style={styles.classTimeContainer}>
-                <Text style={styles.classTime}>{cls.time}</Text>
-                <Text style={styles.classDuration}>{cls.duration}min</Text>
-              </View>
-
-              <View style={styles.classInfo}>
-                <Text style={styles.className}>{cls.name}</Text>
-                <Text style={styles.classInstructor}>{cls.instructor}</Text>
-                <Text style={styles.classDesc}>{cls.description}</Text>
-
-                <View style={styles.capacityInfo}>
-                  <View style={styles.capacityBar}>
-                    <View
-                      style={[
-                        styles.capacityFill,
-                        {
-                          width: `${(cls.enrolled / cls.capacity) * 100}%`,
-                          backgroundColor:
-                            cls.enrolled >= cls.capacity ? Colors.danger : Colors.success,
-                        },
-                      ]}
-                    />
-                  </View>
-                  <Text style={styles.capacityText}>
-                    {cls.enrolled}/{cls.capacity} vagas
+        {days.map((day) => {
+          const count = mockClasses.filter((c) => c.day === day.key).length;
+          return (
+            <TouchableOpacity
+              key={day.key}
+              style={[styles.dayCard, selectedDay === day.key && styles.dayCardActive]}
+              onPress={() => setSelectedDay(day.key)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.dayShort, selectedDay === day.key && styles.dayShortActive]}>
+                {day.short}
+              </Text>
+              {count > 0 && (
+                <View style={[styles.dayBadge, selectedDay === day.key && styles.dayBadgeActive]}>
+                  <Text style={[styles.dayBadgeText, selectedDay === day.key && styles.dayBadgeTextActive]}>
+                    {count}
                   </Text>
                 </View>
+              )}
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
 
-                <TouchableOpacity
-                  style={[
-                    styles.enrollButton,
-                    cls.enrolled >= cls.capacity && styles.enrollButtonDisabled,
-                  ]}
-                  onPress={() => handleEnroll(cls)}
-                  disabled={cls.enrolled >= cls.capacity}
-                >
-                  <Text style={styles.enrollButtonText}>
-                    {cls.enrolled >= cls.capacity ? 'Lotado' : 'Inscrever-se'}
-                  </Text>
-                </TouchableOpacity>
+      <ScrollView style={styles.classList} showsVerticalScrollIndicator={false}>
+        {filteredClasses.length === 0 ? (
+          <EmptyState
+            icon="◎"
+            title="Nenhuma aula"
+            description={`Nenhuma aula agendada para ${selectedDay}`}
+          />
+        ) : (
+          filteredClasses.map((cls) => (
+            <Card key={cls.id} style={styles.classCard}>
+              <View style={styles.classHeader}>
+                <View style={styles.classTimeSection}>
+                  <Text style={styles.classTime}>{cls.time}</Text>
+                  <Text style={styles.classDuration}>{cls.duration} min</Text>
+                </View>
+                <View style={styles.classDivider} />
+                <View style={styles.classInfoSection}>
+                  <Text style={styles.className}>{cls.name}</Text>
+                  <Text style={styles.classInstructor}>{cls.instructor}</Text>
+                </View>
               </View>
-            </View>
+
+              <Text style={styles.classDesc}>{cls.description}</Text>
+
+              <View style={styles.capacitySection}>
+                <View style={styles.capacityHeader}>
+                  <Text style={styles.capacityLabel}>Vagas</Text>
+                  <Text style={styles.capacityValue}>{cls.enrolled} / {cls.capacity}</Text>
+                </View>
+                <ProgressBar
+                  progress={(cls.enrolled / cls.capacity) * 100}
+                  color={cls.enrolled >= cls.capacity ? Colors.danger : Colors.success}
+                  height={6}
+                />
+              </View>
+
+              <TouchableOpacity
+                style={[
+                  styles.enrollButton,
+                  cls.enrolled >= cls.capacity && styles.enrollButtonDisabled,
+                ]}
+                onPress={() => handleEnroll(cls)}
+                activeOpacity={0.7}
+                disabled={cls.enrolled >= cls.capacity}
+              >
+                <Text style={[
+                  styles.enrollText,
+                  cls.enrolled >= cls.capacity && styles.enrollTextDisabled,
+                ]}>
+                  {cls.enrolled >= cls.capacity ? 'Turma Lotada' : 'Inscrever-se'}
+                </Text>
+              </TouchableOpacity>
+            </Card>
           ))
         )}
+
+        <View style={styles.bottomSpacer} />
       </ScrollView>
     </View>
   );
@@ -124,13 +147,14 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.xl,
-    paddingBottom: Spacing.md,
+    paddingTop: Spacing.xxl,
+    paddingBottom: Spacing.sm,
   },
   title: {
-    fontSize: FontSize.xxl,
+    fontSize: FontSize.title,
     fontWeight: 'bold',
     color: Colors.text,
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: FontSize.sm,
@@ -138,76 +162,92 @@ const styles = StyleSheet.create({
     marginTop: Spacing.xs,
   },
   daysContainer: {
-    maxHeight: 50,
+    maxHeight: 70,
     marginBottom: Spacing.md,
   },
   daysContent: {
     paddingHorizontal: Spacing.lg,
     gap: Spacing.sm,
   },
-  dayChip: {
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-    borderRadius: BorderRadius.full,
+  dayCard: {
+    width: 56,
+    height: 60,
+    borderRadius: BorderRadius.lg,
     backgroundColor: Colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: Colors.border,
   },
-  dayChipActive: {
+  dayCardActive: {
     backgroundColor: Colors.primary,
     borderColor: Colors.primary,
   },
-  dayText: {
+  dayShort: {
+    fontSize: FontSize.xs,
+    fontWeight: '700',
     color: Colors.textSecondary,
-    fontSize: FontSize.sm,
-    fontWeight: '500',
+    letterSpacing: 1,
   },
-  dayTextActive: {
+  dayShortActive: {
     color: Colors.white,
   },
-  classesList: {
+  dayBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: Colors.primary + '30',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dayBadgeActive: {
+    backgroundColor: Colors.white + '30',
+  },
+  dayBadgeText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: Colors.primary,
+  },
+  dayBadgeTextActive: {
+    color: Colors.white,
+  },
+  classList: {
     flex: 1,
     paddingHorizontal: Spacing.lg,
   },
-  emptyState: {
-    alignItems: 'center',
-    paddingTop: Spacing.xxl * 2,
-  },
-  emptyIcon: {
-    fontSize: 48,
-    marginBottom: Spacing.md,
-  },
-  emptyText: {
-    fontSize: FontSize.md,
-    color: Colors.textMuted,
-  },
   classCard: {
-    flexDirection: 'row',
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
     marginBottom: Spacing.md,
-    overflow: 'hidden',
   },
-  classTimeContainer: {
-    backgroundColor: Colors.secondary,
-    padding: Spacing.md,
-    justifyContent: 'center',
+  classHeader: {
+    flexDirection: 'row',
     alignItems: 'center',
-    width: 80,
+    marginBottom: Spacing.md,
+  },
+  classTimeSection: {
+    alignItems: 'center',
+    minWidth: 60,
   },
   classTime: {
-    fontSize: FontSize.lg,
+    fontSize: FontSize.xl,
     fontWeight: 'bold',
-    color: Colors.text,
+    color: Colors.primary,
   },
   classDuration: {
     fontSize: FontSize.xs,
-    color: Colors.textSecondary,
-    marginTop: Spacing.xs,
+    color: Colors.textMuted,
+    marginTop: 2,
   },
-  classInfo: {
+  classDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: Colors.border,
+    marginHorizontal: Spacing.md,
+  },
+  classInfoSection: {
     flex: 1,
-    padding: Spacing.md,
   },
   className: {
     fontSize: FontSize.lg,
@@ -216,50 +256,52 @@ const styles = StyleSheet.create({
   },
   classInstructor: {
     fontSize: FontSize.sm,
-    color: Colors.primary,
+    color: Colors.textSecondary,
     marginTop: 2,
   },
   classDesc: {
     fontSize: FontSize.sm,
-    color: Colors.textSecondary,
-    marginTop: Spacing.xs,
+    color: Colors.textMuted,
+    lineHeight: 20,
+    marginBottom: Spacing.md,
   },
-  capacityInfo: {
+  capacitySection: {
+    marginBottom: Spacing.md,
+  },
+  capacityHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: Spacing.sm,
-    gap: Spacing.sm,
+    justifyContent: 'space-between',
+    marginBottom: Spacing.sm,
   },
-  capacityBar: {
-    flex: 1,
-    height: 4,
-    backgroundColor: Colors.border,
-    borderRadius: 2,
-    overflow: 'hidden',
-  },
-  capacityFill: {
-    height: '100%',
-    borderRadius: 2,
-  },
-  capacityText: {
+  capacityLabel: {
     fontSize: FontSize.xs,
     color: Colors.textMuted,
-    minWidth: 60,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  capacityValue: {
+    fontSize: FontSize.xs,
+    fontWeight: '600',
+    color: Colors.textSecondary,
   },
   enrollButton: {
     backgroundColor: Colors.primary,
-    borderRadius: BorderRadius.sm,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    marginTop: Spacing.sm,
-    alignSelf: 'flex-start',
+    borderRadius: BorderRadius.md,
+    paddingVertical: Spacing.md,
+    alignItems: 'center',
   },
   enrollButtonDisabled: {
-    backgroundColor: Colors.border,
+    backgroundColor: Colors.surfaceLight,
   },
-  enrollButtonText: {
+  enrollText: {
     color: Colors.white,
-    fontSize: FontSize.sm,
+    fontSize: FontSize.md,
     fontWeight: '600',
+  },
+  enrollTextDisabled: {
+    color: Colors.textMuted,
+  },
+  bottomSpacer: {
+    height: Spacing.xxl,
   },
 });

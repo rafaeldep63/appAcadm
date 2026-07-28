@@ -9,84 +9,112 @@ import {
 } from 'react-native';
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
 import { mockWorkouts, mockClasses, mockStudents } from '../data/mockData';
+import { StatCard, SectionHeader, Card, Badge, ProgressBar } from '../components/UI';
 
 const { width } = Dimensions.get('window');
 
 export default function HomeScreen({ navigation }: any) {
-  const stats = [
-    { label: 'Alunos Ativos', value: mockStudents.filter(s => s.status === 'ativo').length.toString(), icon: '👥', color: Colors.success },
-    { label: 'Treinos Hoje', value: mockWorkouts.length.toString(), icon: '💪', color: Colors.primary },
-    { label: 'Aulas Semana', value: mockClasses.length.toString(), icon: '📅', color: Colors.info },
-    { label: 'Receita Mensal', value: 'R$ 12.5k', icon: '💰', color: Colors.warning },
-  ];
+  const activeStudents = mockStudents.filter((s) => s.status === 'active' || s.status === 'ativo').length;
+  const totalCapacity = mockClasses.reduce((acc, c) => acc + c.enrolled, 0);
+  const totalMax = mockClasses.reduce((acc, c) => acc + c.capacity, 0);
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>Ola, Admin!</Text>
-          <Text style={styles.subtitle}>Painel da Academia</Text>
+          <Text style={styles.greeting}>Bom dia,</Text>
+          <Text style={styles.userName}>Admin</Text>
         </View>
         <TouchableOpacity style={styles.avatar}>
           <Text style={styles.avatarText}>A</Text>
+          <View style={styles.avatarBadge} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.statsGrid}>
-        {stats.map((stat, index) => (
-          <View key={index} style={[styles.statCard, { borderLeftColor: stat.color }]}>
-            <Text style={styles.statIcon}>{stat.icon}</Text>
-            <Text style={styles.statValue}>{stat.value}</Text>
-            <Text style={styles.statLabel}>{stat.label}</Text>
-          </View>
-        ))}
+        <StatCard
+          icon="●"
+          value={activeStudents.toString()}
+          label="Alunos Ativos"
+          color={Colors.success}
+          trend="+2 esse mes"
+        />
+        <StatCard
+          icon="◈"
+          value={mockWorkouts.length.toString()}
+          label="Treinos Ativos"
+          color={Colors.primary}
+        />
+        <StatCard
+          icon="◎"
+          value={mockClasses.length.toString()}
+          label="Aulas na Semana"
+          color={Colors.info}
+        />
+        <StatCard
+          icon="♦"
+          value={`${totalCapacity}/${totalMax}`}
+          label="Vagas Ocupadas"
+          color={Colors.warning}
+          trend={`${Math.round((totalCapacity / totalMax) * 100)}%`}
+        />
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Proximas Aulas</Text>
-        {mockClasses.slice(0, 3).map((cls) => (
-          <TouchableOpacity key={cls.id} style={styles.classCard}>
-            <View style={styles.classInfo}>
-              <Text style={styles.className}>{cls.name}</Text>
-              <Text style={styles.classDetail}>{cls.instructor} • {cls.day} {cls.time}</Text>
-            </View>
-            <View style={styles.capacityContainer}>
-              <Text style={styles.capacityText}>
-                {cls.enrolled}/{cls.capacity}
-              </Text>
-              <View style={styles.capacityBar}>
-                <View
-                  style={[
-                    styles.capacityFill,
-                    { width: `${(cls.enrolled / cls.capacity) * 100}%` },
-                  ]}
-                />
+        <SectionHeader title="Proximas Aulas" action="Ver todas" onAction={() => navigation.navigate('Aulas')} />
+        {mockClasses.slice(0, 4).map((cls) => (
+          <Card key={cls.id} style={styles.classCard}>
+            <View style={styles.classRow}>
+              <View style={styles.classTimeBlock}>
+                <Text style={styles.classDay}>{cls.day.slice(0, 3).toUpperCase()}</Text>
+                <Text style={styles.classTime}>{cls.time}</Text>
               </View>
+              <View style={styles.classInfo}>
+                <Text style={styles.className}>{cls.name}</Text>
+                <Text style={styles.classInstructor}>{cls.instructor}</Text>
+                <View style={styles.capacityRow}>
+                  <ProgressBar
+                    progress={(cls.enrolled / cls.capacity) * 100}
+                    color={cls.enrolled >= cls.capacity ? Colors.danger : Colors.success}
+                    height={4}
+                  />
+                  <Text style={styles.capacityText}>{cls.enrolled}/{cls.capacity}</Text>
+                </View>
+              </View>
+              <Badge
+                text={cls.enrolled >= cls.capacity ? 'LOTADO' : 'ABERTO'}
+                color={cls.enrolled >= cls.capacity ? Colors.danger : Colors.success}
+                bgColor={cls.enrolled >= cls.capacity ? Colors.dangerBg : Colors.successBg}
+              />
             </View>
-          </TouchableOpacity>
+          </Card>
         ))}
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Atalhos</Text>
+        <SectionHeader title="Atalhos Rapidos" />
         <View style={styles.shortcutsGrid}>
           {[
-            { label: 'Treinos', icon: '🏋️', screen: 'Treinos' },
-            { label: 'Aulas', icon: '📅', screen: 'Aulas' },
-            { label: 'Alunos', icon: '👥', screen: 'Alunos' },
-            { label: 'Progresso', icon: '📊', screen: 'Progresso' },
+            { label: 'Treinos', icon: '◈', screen: 'Treinos', color: Colors.primary },
+            { label: 'Aulas', icon: '◎', screen: 'Aulas', color: Colors.info },
+            { label: 'Alunos', icon: '◉', screen: 'Alunos', color: Colors.success },
+            { label: 'Progresso', icon: '◆', screen: 'Progresso', color: Colors.warning },
           ].map((shortcut, index) => (
             <TouchableOpacity
               key={index}
               style={styles.shortcutCard}
               onPress={() => navigation.navigate(shortcut.screen)}
             >
-              <Text style={styles.shortcutIcon}>{shortcut.icon}</Text>
+              <View style={[styles.shortcutIcon, { backgroundColor: shortcut.color + '20' }]}>
+                <Text style={[styles.shortcutIconText, { color: shortcut.color }]}>{shortcut.icon}</Text>
+              </View>
               <Text style={styles.shortcutLabel}>{shortcut.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
       </View>
+
+      <View style={styles.bottomSpacer} />
     </ScrollView>
   );
 }
@@ -101,77 +129,81 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.xl,
+    paddingTop: Spacing.xxl,
     paddingBottom: Spacing.md,
   },
   greeting: {
-    fontSize: FontSize.xxl,
-    fontWeight: 'bold',
-    color: Colors.text,
-  },
-  subtitle: {
     fontSize: FontSize.md,
     color: Colors.textSecondary,
-    marginTop: Spacing.xs,
+  },
+  userName: {
+    fontSize: FontSize.title,
+    fontWeight: 'bold',
+    color: Colors.text,
+    letterSpacing: -0.5,
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     backgroundColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   avatarText: {
     color: Colors.white,
     fontSize: FontSize.xl,
     fontWeight: 'bold',
   },
+  avatarBadge: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: Colors.success,
+    borderWidth: 2,
+    borderColor: Colors.primary,
+  },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: Spacing.md,
+    paddingHorizontal: Spacing.lg,
     gap: Spacing.sm,
-  },
-  statCard: {
-    width: (width - Spacing.md * 2 - Spacing.sm) / 2,
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    borderLeftWidth: 3,
-  },
-  statIcon: {
-    fontSize: 24,
-    marginBottom: Spacing.xs,
-  },
-  statValue: {
-    fontSize: FontSize.xl,
-    fontWeight: 'bold',
-    color: Colors.text,
-  },
-  statLabel: {
-    fontSize: FontSize.xs,
-    color: Colors.textSecondary,
-    marginTop: Spacing.xs,
   },
   section: {
     marginTop: Spacing.lg,
     paddingHorizontal: Spacing.lg,
   },
-  sectionTitle: {
-    fontSize: FontSize.lg,
-    fontWeight: 'bold',
-    color: Colors.text,
-    marginBottom: Spacing.md,
-  },
   classCard: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
     marginBottom: Spacing.sm,
+  },
+  classRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: Spacing.md,
+  },
+  classTimeBlock: {
+    alignItems: 'center',
+    minWidth: 50,
+  },
+  classDay: {
+    fontSize: FontSize.xs,
+    fontWeight: '700',
+    color: Colors.primary,
+    letterSpacing: 1,
+  },
+  classTime: {
+    fontSize: FontSize.sm,
+    fontWeight: '600',
+    color: Colors.text,
+    marginTop: 2,
   },
   classInfo: {
     flex: 1,
@@ -181,50 +213,51 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.text,
   },
-  classDetail: {
-    fontSize: FontSize.sm,
+  classInstructor: {
+    fontSize: FontSize.xs,
     color: Colors.textSecondary,
-    marginTop: Spacing.xs,
+    marginTop: 2,
   },
-  capacityContainer: {
-    alignItems: 'flex-end',
-    width: 80,
+  capacityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: Spacing.sm,
+    gap: Spacing.sm,
   },
   capacityText: {
     fontSize: FontSize.xs,
-    color: Colors.textSecondary,
-    marginBottom: Spacing.xs,
-  },
-  capacityBar: {
-    width: 80,
-    height: 4,
-    backgroundColor: Colors.border,
-    borderRadius: 2,
-    overflow: 'hidden',
-  },
-  capacityFill: {
-    height: '100%',
-    backgroundColor: Colors.primary,
-    borderRadius: 2,
+    color: Colors.textMuted,
   },
   shortcutsGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: Spacing.sm,
   },
   shortcutCard: {
-    width: (width - Spacing.lg * 2 - Spacing.sm * 3) / 4,
+    flex: 1,
     backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
+    borderRadius: BorderRadius.lg,
     padding: Spacing.md,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   shortcutIcon: {
-    fontSize: 28,
-    marginBottom: Spacing.xs,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: Spacing.sm,
+  },
+  shortcutIconText: {
+    fontSize: 20,
   },
   shortcutLabel: {
     fontSize: FontSize.xs,
     color: Colors.textSecondary,
+    fontWeight: '500',
+  },
+  bottomSpacer: {
+    height: Spacing.xxl,
   },
 });

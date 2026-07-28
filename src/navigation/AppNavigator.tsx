@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text } from 'react-native';
-import { Colors, FontSize } from '../theme';
+import { Text, View, StyleSheet } from 'react-native';
+import { Colors, FontSize, BorderRadius } from '../theme';
 
 import HomeScreen from '../screens/HomeScreen';
 import WorkoutsScreen from '../screens/WorkoutsScreen';
@@ -12,38 +12,39 @@ import ProgressScreen from '../screens/ProgressScreen';
 const Tab = createBottomTabNavigator();
 
 const tabs = [
-  { name: 'Home', label: 'Inicio', icon: '🏠' },
-  { name: 'Treinos', label: 'Treinos', icon: '💪' },
-  { name: 'Aulas', label: 'Aulas', icon: '📅' },
-  { name: 'Alunos', label: 'Alunos', icon: '👥' },
-  { name: 'Progresso', label: 'Progresso', icon: '📊' },
+  { name: 'Home', label: 'Inicio', icon: '⬡', iconActive: '⬢' },
+  { name: 'Treinos', label: 'Treinos', icon: '◈', iconActive: '◈' },
+  { name: 'Aulas', label: 'Aulas', icon: '◎', iconActive: '◎' },
+  { name: 'Alunos', label: 'Alunos', icon: '◉', iconActive: '◉' },
+  { name: 'Progresso', label: 'Progresso', icon: '◆', iconActive: '◆' },
 ];
+
+const screens: Record<string, any> = {
+  Home: HomeScreen,
+  Treinos: WorkoutsScreen,
+  Aulas: ClassesScreen,
+  Alunos: StudentsScreen,
+  Progresso: ProgressScreen,
+};
 
 export default function AppNavigator() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarStyle: {
-          backgroundColor: Colors.surface,
-          borderTopColor: Colors.border,
-          borderTopWidth: 1,
-          height: 70,
-          paddingBottom: 10,
-          paddingTop: 8,
-        },
+        tabBarStyle: styles.tabBar,
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.textMuted,
-        tabBarLabelStyle: {
-          fontSize: FontSize.xs,
-          fontWeight: '500',
-        },
+        tabBarLabelStyle: styles.tabLabel,
         tabBarIcon: ({ focused }) => {
           const tab = tabs.find((t) => t.name === route.name);
+          const icon = focused ? tab?.iconActive : tab?.icon;
           return (
-            <Text style={{ fontSize: 22, opacity: focused ? 1 : 0.5 }}>
-              {tab?.icon}
-            </Text>
+            <View style={[styles.tabIconContainer, focused && styles.tabIconActive]}>
+              <Text style={[styles.tabIcon, focused && styles.tabIconActiveText]}>
+                {icon}
+              </Text>
+            </View>
           );
         },
       })}
@@ -52,20 +53,49 @@ export default function AppNavigator() {
         <Tab.Screen
           key={tab.name}
           name={tab.name}
-          component={
-            tab.name === 'Home'
-              ? HomeScreen
-              : tab.name === 'Treinos'
-              ? WorkoutsScreen
-              : tab.name === 'Aulas'
-              ? ClassesScreen
-              : tab.name === 'Alunos'
-              ? StudentsScreen
-              : ProgressScreen
-          }
+          component={screens[tab.name]}
           options={{ tabBarLabel: tab.label }}
         />
       ))}
     </Tab.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: Colors.surface,
+    borderTopColor: Colors.border,
+    borderTopWidth: 1,
+    height: 75,
+    paddingBottom: 12,
+    paddingTop: 8,
+    elevation: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+  },
+  tabLabel: {
+    fontSize: FontSize.xs,
+    fontWeight: '500',
+    marginTop: 2,
+  },
+  tabIconContainer: {
+    width: 36,
+    height: 28,
+    borderRadius: BorderRadius.sm,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tabIconActive: {
+    backgroundColor: Colors.primary + '20',
+  },
+  tabIcon: {
+    fontSize: 18,
+    opacity: 0.5,
+  },
+  tabIconActiveText: {
+    fontSize: 18,
+    opacity: 1,
+  },
+});
