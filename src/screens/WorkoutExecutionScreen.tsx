@@ -214,9 +214,8 @@ export default function WorkoutExecutionScreen({ workout, onFinish }: Props) {
                 : 'Finalizar Treino'}
             </Text>
           </TouchableOpacity>
-                </View>
-                </>
-              )}
+        </View>
+      )}
     </View>
   );
 }
