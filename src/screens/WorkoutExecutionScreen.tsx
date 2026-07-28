@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
 import { useData } from '../context/DataContext';
+import { useAuth } from '../context/AuthContext';
 import { Workout } from '../data/types';
 import { Card, Badge } from '../components/UI';
 
@@ -27,6 +28,7 @@ export default function WorkoutExecutionScreen({ workout, onFinish }: Props) {
   const [timer, setTimer] = useState(0);
   const [isRunning, setIsRunning] = useState(true);
   const { addWorkoutHistory } = useData();
+  const { user } = useAuth();
   const startTime = useRef(Date.now());
 
   useEffect(() => {
@@ -68,7 +70,7 @@ export default function WorkoutExecutionScreen({ workout, onFinish }: Props) {
         id: Date.now().toString(),
         workoutId: workout.id,
         workoutName: workout.name,
-        studentId: 'admin',
+        studentId: user?.id || 'admin',
         date: new Date().toLocaleDateString('pt-BR'),
         duration,
         completed: true,

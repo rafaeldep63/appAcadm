@@ -10,6 +10,7 @@ import WorkoutsScreen from '../screens/WorkoutsScreen';
 import WorkoutCalendarScreen from '../screens/WorkoutCalendarScreen';
 import ProgressScreen from '../screens/ProgressScreen';
 import WorkoutExecutionScreen from '../screens/WorkoutExecutionScreen';
+import AddWorkoutScreen from '../screens/AddWorkoutScreen';
 import AddMeasurementScreen from '../screens/AddMeasurementScreen';
 
 const Tab = createBottomTabNavigator();
@@ -59,7 +60,7 @@ function TabNavigator({ customNavigation }: any) {
 export default function StudentNavigator() {
   const [screen, setScreen] = useState<string>('tabs');
   const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
-  const { workouts } = useData();
+  const { workouts, addWorkout } = useData();
 
   const goBack = () => setScreen('tabs');
 
@@ -75,6 +76,18 @@ export default function StudentNavigator() {
     );
   }
 
+  if (screen === 'addWorkout') {
+    return (
+      <AddWorkoutScreen
+        onBack={goBack}
+        onSave={(workout) => {
+          addWorkout(workout);
+          goBack();
+        }}
+      />
+    );
+  }
+
   if (screen === 'addMeasurement') {
     return <AddMeasurementScreen onBack={goBack} />;
   }
@@ -83,7 +96,9 @@ export default function StudentNavigator() {
     <TabNavigator
       customNavigation={{
         navigate: (name: string, params?: any) => {
-          if (name === 'WorkoutExecution') {
+          if (name === 'AddWorkout') {
+            setScreen('addWorkout');
+          } else if (name === 'WorkoutExecution') {
             setSelectedWorkout(params?.workout || workouts[0]);
             setScreen('workoutExecution');
           } else if (name === 'AddMeasurement') {
