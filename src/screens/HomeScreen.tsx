@@ -8,15 +8,20 @@ import {
   Dimensions,
 } from 'react-native';
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
-import { mockWorkouts, mockClasses, mockStudents } from '../data/mockData';
-import { StatCard, SectionHeader, Card, Badge, ProgressBar } from '../components/UI';
+import { useWorkouts } from '../context/WorkoutContext';
+import { mockStudents } from '../data/mockData';
+import { StatCard, SectionHeader, Card, Badge } from '../components/UI';
 
 const { width } = Dimensions.get('window');
 
 export default function HomeScreen({ navigation }: any) {
-  const activeStudents = mockStudents.filter((s) => s.status === 'active' || s.status === 'ativo').length;
-  const totalCapacity = mockClasses.reduce((acc, c) => acc + c.enrolled, 0);
-  const totalMax = mockClasses.reduce((acc, c) => acc + c.capacity, 0);
+  const { workouts, isWorkoutComplete } = useWorkouts();
+  const activeStudents = mockStudents.filter((s) => s.status === 'ativo').length;
+  const totalExercises = workouts.reduce((acc, w) => acc + w.exercises.length, 0);
+
+  const today: string = 'Segunda';
+  const todayWorkouts = workouts.filter((w) => w.day === today);
+  const todayDone = todayWorkouts.filter((w) => isWorkoutComplete(w.id, w.day)).length;
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -41,54 +46,57 @@ export default function HomeScreen({ navigation }: any) {
         />
         <StatCard
           icon="◈"
-          value={mockWorkouts.length.toString()}
+          value={workouts.length.toString()}
           label="Treinos Ativos"
           color={Colors.primary}
         />
         <StatCard
           icon="◎"
-          value={mockClasses.length.toString()}
-          label="Aulas na Semana"
+          value={totalExercises.toString()}
+          label="Total Exercicios"
           color={Colors.info}
         />
         <StatCard
           icon="♦"
-          value={`${totalCapacity}/${totalMax}`}
-          label="Vagas Ocupadas"
+          value={`${todayDone}/${todayWorkouts.length}`}
+          label="Treinos Hoje"
           color={Colors.warning}
-          trend={`${Math.round((totalCapacity / totalMax) * 100)}%`}
+          trend={today === 'Domingo' ? 'descanso' : `${today}`}
         />
       </View>
 
       <View style={styles.section}>
-        <SectionHeader title="Proximas Aulas" action="Ver todas" onAction={() => navigation.navigate('Aulas')} />
-        {mockClasses.slice(0, 4).map((cls) => (
-          <Card key={cls.id} style={styles.classCard}>
-            <View style={styles.classRow}>
-              <View style={styles.classTimeBlock}>
-                <Text style={styles.classDay}>{cls.day.slice(0, 3).toUpperCase()}</Text>
-                <Text style={styles.classTime}>{cls.time}</Text>
-              </View>
-              <View style={styles.classInfo}>
-                <Text style={styles.className}>{cls.name}</Text>
-                <Text style={styles.classInstructor}>{cls.instructor}</Text>
-                <View style={styles.capacityRow}>
-                  <ProgressBar
-                    progress={(cls.enrolled / cls.capacity) * 100}
-                    color={cls.enrolled >= cls.capacity ? Colors.danger : Colors.success}
-                    height={4}
-                  />
-                  <Text style={styles.capacityText}>{cls.enrolled}/{cls.capacity}</Text>
-                </View>
-              </View>
-              <Badge
-                text={cls.enrolled >= cls.capacity ? 'LOTADO' : 'ABERTO'}
-                color={cls.enrolled >= cls.capacity ? Colors.danger : Colors.success}
-                bgColor={cls.enrolled >= cls.capacity ? Colors.dangerBg : Colors.successBg}
-              />
-            </View>
+        <SectionHeader title="Treinos de Hoje" action="Ver todos" onAction={() => navigation.navigate('Calendario')} />
+        {todayWorkouts.length === 0 ? (
+          <Card>
+            <Text style={styles.emptyText}>Nenhum treino para hoje</Text>
           </Card>
-        ))}
+        ) : (
+          todayWorkouts.map((workout) => {
+            const done = isWorkoutComplete(workout.id, workout.day);
+            return (
+              <Card key={workout.id} style={styles.classCard}>
+                <View style={styles.classRow}>
+                  <View style={styles.classTimeBlock}>
+                    <Text style={styles.classDay}>{workout.day.slice(0, 3).toUpperCase()}</Text>
+                    <Text style={styles.classTime}>{workout.exercises.length}ex</Text>
+                  </View>
+                  <View style={styles.classInfo}>
+                    <Text style={styles.className}>{workout.name}</Text>
+                    <Text style={styles.classInstructor}>
+                      {workout.exercises.reduce((acc, we) => acc + we.sets.length, 0)} series
+                    </Text>
+                  </View>
+                  <Badge
+                    text={done ? 'FEITO' : 'PENDENTE'}
+                    color={done ? Colors.success : Colors.textMuted}
+                    bgColor={done ? Colors.successBg : Colors.border}
+                  />
+                </View>
+              </Card>
+            );
+          })
+        )}
       </View>
 
       <View style={styles.section}>
@@ -96,7 +104,7 @@ export default function HomeScreen({ navigation }: any) {
         <View style={styles.shortcutsGrid}>
           {[
             { label: 'Treinos', icon: '◈', screen: 'Treinos', color: Colors.primary },
-            { label: 'Aulas', icon: '◎', screen: 'Aulas', color: Colors.info },
+            { label: 'Calendario', icon: '◎', screen: 'Calendario', color: Colors.info },
             { label: 'Alunos', icon: '◉', screen: 'Alunos', color: Colors.success },
             { label: 'Progresso', icon: '◆', screen: 'Progresso', color: Colors.warning },
           ].map((shortcut, index) => (
@@ -259,5 +267,11 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: Spacing.xxl,
+  },
+  emptyText: {
+    fontSize: FontSize.sm,
+    color: Colors.textMuted,
+    textAlign: 'center',
+    paddingVertical: Spacing.md,
   },
 });

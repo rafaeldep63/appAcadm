@@ -9,15 +9,16 @@ import {
   Alert,
 } from 'react-native';
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
-import { mockWorkouts } from '../data/mockData';
+import { useWorkouts } from '../context/WorkoutContext';
 import { Workout } from '../data/types';
 import { Card, Badge, SectionHeader, EmptyState } from '../components/UI';
 
-export default function WorkoutsScreen({ navigation }: any) {
+export default function WorkoutsScreen({ customNavigation }: any) {
   const [search, setSearch] = useState('');
   const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
+  const { workouts } = useWorkouts();
 
-  const filteredWorkouts = mockWorkouts.filter((w) =>
+  const filteredWorkouts = workouts.filter((w) =>
     w.name.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -138,7 +139,7 @@ export default function WorkoutsScreen({ navigation }: any) {
         )}
       </ScrollView>
 
-      <TouchableOpacity style={styles.fab} activeOpacity={0.8} onPress={() => navigation?.navigate('AddWorkout')}>
+      <TouchableOpacity style={styles.fab} activeOpacity={0.8} onPress={() => customNavigation?.navigate('AddWorkout')}>
         <Text style={styles.fabIcon}>+</Text>
       </TouchableOpacity>
     </View>

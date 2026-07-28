@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
 import { mockExercises } from '../data/mockData';
-import { Exercise } from '../data/types';
+import { Exercise, Workout, WorkoutSet } from '../data/types';
 import { Card, Badge } from '../components/UI';
 
 interface Props {
@@ -52,9 +52,20 @@ export default function AddWorkoutScreen({ onBack, onSave }: Props) {
       Alert.alert('Erro', 'Adicione pelo menos 1 exercicio.');
       return;
     }
-    Alert.alert('Sucesso', 'Treino criado com sucesso!', [
-      { text: 'OK', onPress: onBack },
-    ]);
+    const newWorkout: Workout = {
+      id: Date.now().toString(),
+      name,
+      day: selectedDay,
+      exercises: selectedExercises.map((se) => ({
+        exercise: se.exercise,
+        sets: Array.from({ length: parseInt(se.sets) || 3 }, (): WorkoutSet => ({
+          reps: parseInt(se.reps) || 12,
+          weight: parseInt(se.weight) || 0,
+          rest: 60,
+        })),
+      })),
+    };
+    onSave(newWorkout);
   };
 
   return (

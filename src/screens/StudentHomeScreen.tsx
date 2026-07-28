@@ -8,17 +8,17 @@ import {
   Dimensions,
 } from 'react-native';
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
-import { mockWorkouts, mockClasses } from '../data/mockData';
+import { useWorkouts } from '../context/WorkoutContext';
 import { useAuth } from '../context/AuthContext';
 import { Card, Badge, SectionHeader, ProgressBar, StatCard } from '../components/UI';
 
 const { width } = Dimensions.get('window');
 
-export default function StudentHomeScreen({ navigation }: any) {
+export default function StudentHomeScreen({ customNavigation }: any) {
   const { user, logout } = useAuth();
+  const { workouts } = useWorkouts();
 
-  const nextClass = mockClasses[0];
-  const todayWorkout = mockWorkouts[0];
+  const todayWorkout = workouts.find((w) => w.day === 'Segunda') || workouts[0];
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -79,33 +79,10 @@ export default function StudentHomeScreen({ navigation }: any) {
             </View>
           ))}
 
-          <TouchableOpacity style={styles.startButton} activeOpacity={0.8} onPress={() => navigation?.navigate('WorkoutExecution', { workout: todayWorkout })}>
+          <TouchableOpacity style={styles.startButton} activeOpacity={0.8} onPress={() => customNavigation?.navigate('WorkoutExecution', { workout: todayWorkout })}>
             <Text style={styles.startButtonText}>Iniciar Treino</Text>
             <Text style={styles.startButtonArrow}>→</Text>
           </TouchableOpacity>
-        </Card>
-      </View>
-
-      <View style={styles.section}>
-        <SectionHeader title="Proxima Aula" />
-        <Card style={styles.nextClassCard}>
-          <View style={styles.nextClassRow}>
-            <View style={styles.nextClassTimeBlock}>
-              <Text style={styles.nextClassDay}>{nextClass.day.slice(0, 3).toUpperCase()}</Text>
-              <Text style={styles.nextClassTime}>{nextClass.time}</Text>
-            </View>
-            <View style={styles.nextClassDivider} />
-            <View style={styles.nextClassInfo}>
-              <Text style={styles.nextClassName}>{nextClass.name}</Text>
-              <Text style={styles.nextClassInstructor}>{nextClass.instructor}</Text>
-              <Text style={styles.nextClassDuration}>{nextClass.duration} minutos</Text>
-            </View>
-            <Badge
-              text={nextClass.enrolled >= nextClass.capacity ? 'LOTADO' : 'ABERTO'}
-              color={nextClass.enrolled >= nextClass.capacity ? Colors.danger : Colors.success}
-              bgColor={nextClass.enrolled >= nextClass.capacity ? Colors.dangerBg : Colors.successBg}
-            />
-          </View>
         </Card>
       </View>
 

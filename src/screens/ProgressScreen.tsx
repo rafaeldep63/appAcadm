@@ -29,7 +29,7 @@ const weeklyWorkouts = [
   { day: 'DOM', completed: false, duration: 0 },
 ];
 
-export default function ProgressScreen({ navigation }: any) {
+export default function ProgressScreen({ customNavigation }: any) {
   const latest = mockProgressData[mockProgressData.length - 1];
   const previous = mockProgressData[mockProgressData.length - 2];
   const weightDiff = latest.weight - previous.weight;
@@ -161,7 +161,7 @@ export default function ProgressScreen({ navigation }: any) {
         ))}
       </View>
 
-      <TouchableOpacity style={styles.addButton} activeOpacity={0.8} onPress={() => navigation?.navigate('AddMeasurement')}>
+      <TouchableOpacity style={styles.addButton} activeOpacity={0.8} onPress={() => customNavigation?.navigate('AddMeasurement')}>
         <Text style={styles.addButtonText}>+ Registrar Novas Medidas</Text>
       </TouchableOpacity>
 

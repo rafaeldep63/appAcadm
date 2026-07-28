@@ -13,7 +13,7 @@ import { mockStudents } from '../data/mockData';
 import { Student } from '../data/types';
 import { Card, Badge, EmptyState } from '../components/UI';
 
-export default function StudentsScreen() {
+export default function StudentsScreen({ navigation }: any) {
   const [search, setSearch] = useState('');
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
@@ -103,7 +103,7 @@ export default function StudentsScreen() {
             <Text style={[styles.actionIcon, { color: Colors.primary }]}>✎</Text>
             <Text style={[styles.actionLabel, { color: Colors.primary }]}>Editar</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.actionCard, { backgroundColor: Colors.success + '15' }]} activeOpacity={0.7}>
+          <TouchableOpacity style={[styles.actionCard, { backgroundColor: Colors.success + '15' }]} activeOpacity={0.7} onPress={() => navigation?.navigate('Treinos')}>
             <Text style={[styles.actionIcon, { color: Colors.success }]}>◈</Text>
             <Text style={[styles.actionLabel, { color: Colors.success }]}>Treino</Text>
           </TouchableOpacity>

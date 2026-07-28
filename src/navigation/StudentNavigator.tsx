@@ -2,25 +2,26 @@ import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, View, StyleSheet } from 'react-native';
 import { Colors, FontSize, BorderRadius } from '../theme';
+import { useWorkouts } from '../context/WorkoutContext';
+import { Workout } from '../data/types';
 
 import StudentHomeScreen from '../screens/StudentHomeScreen';
 import WorkoutsScreen from '../screens/WorkoutsScreen';
-import ClassesScreen from '../screens/ClassesScreen';
+import WorkoutCalendarScreen from '../screens/WorkoutCalendarScreen';
 import ProgressScreen from '../screens/ProgressScreen';
 import WorkoutExecutionScreen from '../screens/WorkoutExecutionScreen';
 import AddMeasurementScreen from '../screens/AddMeasurementScreen';
-import { mockWorkouts } from '../data/mockData';
 
 const Tab = createBottomTabNavigator();
 
 const tabs = [
   { name: 'Home', label: 'Inicio', icon: '⬡', iconActive: '⬢' },
   { name: 'Treinos', label: 'Treinos', icon: '◈', iconActive: '◈' },
-  { name: 'Aulas', label: 'Aulas', icon: '◎', iconActive: '◎' },
+  { name: 'Calendario', label: 'Calendario', icon: '◎', iconActive: '◎' },
   { name: 'Progresso', label: 'Progresso', icon: '◆', iconActive: '◆' },
 ];
 
-function TabNavigator({ navigation }: any) {
+function TabNavigator({ customNavigation }: any) {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -43,10 +44,10 @@ function TabNavigator({ navigation }: any) {
       {tabs.map((tab) => (
         <Tab.Screen key={tab.name} name={tab.name} options={{ tabBarLabel: tab.label }}>
           {(props) => {
-            if (tab.name === 'Home') return <StudentHomeScreen {...props} navigation={navigation} />;
-            if (tab.name === 'Treinos') return <WorkoutsScreen {...props} navigation={navigation} />;
-            if (tab.name === 'Aulas') return <ClassesScreen {...props} />;
-            if (tab.name === 'Progresso') return <ProgressScreen {...props} navigation={navigation} />;
+            if (tab.name === 'Home') return <StudentHomeScreen {...props} customNavigation={customNavigation} />;
+            if (tab.name === 'Treinos') return <WorkoutsScreen {...props} customNavigation={customNavigation} />;
+            if (tab.name === 'Calendario') return <WorkoutCalendarScreen {...props} />;
+            if (tab.name === 'Progresso') return <ProgressScreen {...props} customNavigation={customNavigation} />;
             return null;
           }}
         </Tab.Screen>
@@ -57,7 +58,10 @@ function TabNavigator({ navigation }: any) {
 
 export default function StudentNavigator() {
   const [screen, setScreen] = useState<string>('tabs');
-  const [selectedWorkout, setSelectedWorkout] = useState<any>(null);
+  const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
+  const { workouts } = useWorkouts();
+
+  const goBack = () => setScreen('tabs');
 
   if (screen === 'workoutExecution' && selectedWorkout) {
     return (
@@ -65,22 +69,22 @@ export default function StudentNavigator() {
         workout={selectedWorkout}
         onFinish={() => {
           setSelectedWorkout(null);
-          setScreen('tabs');
+          goBack();
         }}
       />
     );
   }
 
   if (screen === 'addMeasurement') {
-    return <AddMeasurementScreen onBack={() => setScreen('tabs')} />;
+    return <AddMeasurementScreen onBack={goBack} />;
   }
 
   return (
     <TabNavigator
-      navigation={{
+      customNavigation={{
         navigate: (name: string, params?: any) => {
           if (name === 'WorkoutExecution') {
-            setSelectedWorkout(params?.workout || mockWorkouts[0]);
+            setSelectedWorkout(params?.workout || workouts[0]);
             setScreen('workoutExecution');
           } else if (name === 'AddMeasurement') {
             setScreen('addMeasurement');
