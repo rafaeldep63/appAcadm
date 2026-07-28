@@ -174,6 +174,7 @@ export default function WorkoutExecutionScreen({ workout, onFinish }: Props) {
                     </View>
                   ))}
                 </View>
+                </>
               )}
 
               {exerciseIndex < currentExercise && (
