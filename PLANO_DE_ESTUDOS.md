@@ -1,124 +1,137 @@
 # Plano de Vidas - Rafael
 
-## Situacao
+## Situacao Real
+- Acorda: 6h
 - Escola: 7h - 16h
-- Curso (UNIPAC): 19h - 22h
-- Horas livres: 16h-19h, 22h-23h, finais de semana
+- Chega em casa: 17h
+- Curso (UNIPAC): 19h - 23h
+- Chega em casa cansado: ~23h
+- Horas livres reais: SO FINAIS DE SEMANA + 6h-7h de manha
 
 ---
 
-## SEGUNDA A SEXTA (Dias de semana)
+## SEGUNDA A SEXTA — Pequenos habitos
 
-### Manha (6h - 7h) — HABITO SAUDAVEL
+### Manha (6h - 6h45)
 - 6h00: Acordar, beber agua
-- 6h05: Alongamento leve (10 min) — YouTube: "alongamento matinal"
-- 6h15: Preparar mochila e tomar cafe da manha
-- 6h45: Sair pra escola
+- 6h05: Alongamento (10 min) — YouTube "alongamento matinal"
+- 6h15: Cafe da manha
+- 6h40: Sair pra escola
+- **Nada de programacao nesse horario — so saude**
 
-### Tarde (16h - 17h30) — PROGRAMACAO
-- 16h00 - 16h45: Ver aula de HTML/CSS (Curso em Video)
-- 16h45 - 17h30: Praticar o que aprendeu (fazer os exercicios)
+### Noite (23h+)
+- SO beber agua e dormir
+- Nao estuda cansado — nao vai reter nada
+- Meta: dormir ate 23h30 no maximo
 
-### Noite (22h - 22h30) — INGLES
-- 22h00 - 22h30: Duolingo (30 min sem falhar)
-- Foca em: ingles basico → intermediario
+### IMPORTANTE nesses dias
+- Se tiver **um pouco de energia**, abre o Duolingo no celular (5 min no busao, 5 min antes de dormir)
+- Nao precisa ser 30 min — 5 minutos ja conta
 
 ---
 
-## SABADO — DIA PRINCIPAL DE ESTUDOS
+## SABADO — DIA PRINCIPAL (o mais importante!)
 
 ### Manha
 - 7h00: Acordar
-- 7h15 - 7h45: Correr (comecar devagar, 15 min e ta bom)
-- 7h45 - 8h15: Banho e cafe da manha
-- 8h15 - 9h15: PROGRAMACAO (ver aula + praticar)
-- 9h15 - 9h30: Descanso
-- 9h30 - 10h30: PROGRAMACAO (continuar ou fazer projeto)
-- 10h30 - 11h00: INGLES (Duolingo + ver video simples no YouTube)
+- 7h15 - 7h30: Correr / caminhar (comece devagar!)
+- 7h30 - 8h00: Banho + cafe da manha
+- **8h00 - 9h30: PROGRAMACAO** (aula + exercicio)
+- 9h30 - 9h45: Descanso
+- **9h45 - 10h45: PROGRAMACAO** (pratica sozinho)
+- **10h45 - 11h15: INGLES** (Duolingo + video simples)
 
 ### Tarde
-- Livre — descansa, sai com amigos, faz o que quiser
+- LIVRE — descansa, sai, joga, faz o que quiser
 
 ---
 
 ## DOMINGO — DIA DE CONSOLIDAR
 
 ### Manha
-- 8h00: Acordar (pode dormir mais)
-- 8h30 - 9h00: Correr (tentar um pouco mais que no sabado)
-- 9h00 - 9h30: Banho e cafe da manha
-- 9h30 - 10h30: Revisar o que aprendeu na semana (programacao)
-- 10h30 - 11h00: INGLES
+- 8h00: Acordar
+- 8h15 - 8h30: Correr / caminhar
+- 8h30 - 9h00: Banho + cafe da manha
+- **9h00 - 10h00: PROGRAMACAO** (revisar o da semana)
+- **10h00 - 10h30: INGLES**
 
 ### Tarde
-- Livre
+- LIVRE
 
 ---
 
-## ROTINA DE PROGRAMACAO (por mes)
+## TOTAL DE HORAS POR SEMANA
+
+| Dia | Programacao | Ingles | Corrida |
+|-----|-------------|--------|---------|
+| Seg-Sex | 0 (só habitos de saude) | 5 min/dia (Duolingo) | - |
+| Sabado | 2h30 | 30 min | 15-30 min |
+| Domingo | 1h | 30 min | 15-30 min |
+| **TOTAL** | **3h30/semana** | **~2h/semana** | **2x/semana** |
+
+E menos do que eu planejei antes, MAS e **realista**. E melhor 3h30 toda semana do que 10h e desistir no segundo dia.
+
+---
+
+## ROTINA DE PROGRAMACAO
 
 ### Mes 1-2: HTML + CSS
 - Curso: "HTML5 e CSS3" — Curso em Video (GRATUITO)
 - Meta: Fazer 5 paginas web diferentes
-- Exercicios do W3Schools
 
 ### Mes 3-4: JavaScript
 - Curso: "JavaScript" — Curso em Video
-- Meta: Fazer calculadora, lista de tarefas, jogo da velha
+- Meta: Calculadora, lista de tarefas, jogo da velha
 
 ### Mes 5-6: React
 - Curso: "React" — Rocketseat (YouTube)
-- Meta: Fazer um clone simples de Netflix ou Spotify
+- Meta: Clone de Netflix ou Spotify
 
 ### Mes 7-8: React Native
-- Voltar pro AcadApp e entender tudo que voce criou
-- Meta: Adicionar funcionalidades novas sozinho
+- Voltar pro AcadApp e entender tudo
 
 ---
 
 ## ROTINA DE CORRIDA (Progressiva)
 
-| Semana | Tempo | Distancia aprox |
-|--------|-------|-----------------|
-| 1-2 | 15 min caminhando/correndo | ~1 km |
-| 3-4 | 20 min | ~1.5 km |
-| 5-6 | 25 min | ~2 km |
-| 7-8 | 30 min | ~2.5 km |
-| 9+ | 30 min correndo sem parar | ~3 km |
+| Semana | Tempo | O que fazer |
+|--------|-------|-------------|
+| 1-2 | 10 min | Caminhar rapido, alternar com corrida leve |
+| 3-4 | 15 min | Aumentar os trechos correndo |
+| 5-6 | 20 min | Correr mais que caminhar |
+| 7-8 | 25 min | Correr sem parar (devagar!) |
+| 9+ | 30 min | Ja ta correndo! |
 
-Regra: CORRE DEVAGAR. Se nao consegue falar enquanto corre, ta correndo rapido demais.
+Regra de ouro: **se nao consegue falar enquanto corre, ta rapido demais**
 
 ---
 
 ## ROTINA DE INGLES
 
-| Nivel | O que fazer | Tempo |
-|-------|-------------|-------|
-| Basico | Duolingo todo dia | 30 min |
-| Depois | Assisted series com legendas em ingles | 30 min |
-| Depois | Ler artigos simples no Medium | 20 min |
-| Avancado | Assisted series SEM legenda | 30 min |
+| Fase | O que fazer | Onde |
+|------|-------------|------|
+| Agora | Duolingo todo dia | Celular, 5 min no busao |
+| Mes 2+ | Duolingo + 1 video simples | YouTube "English for beginners" |
+| Mes 4+ | Assister serie com legendas em ingles | Netflix, YouTube |
+| Mes 6+ | Serie SEM legenda | Netflix, YouTube |
 
 ---
 
-## DICAS IMPORTANTES
+## QUANDO PROCURAR EMPREGO
 
-1. **Nao pule dias** — 30 min todo dia > 5 horas um dia so
-2. **Se errar, nao para** — volta no dia seguinte
-3. **Fim de semana e sagrado** — estuda de manha, tarde e livre
-4. **Nao se compare** — cada pessoa tem seu ritmo
-5. **Dormir bem** — dormir ate 23h no maximo
-6. **Água** — beba pelo menos 1.5L por dia
+- **6 meses**: comeca a mandar curriculo basico
+- **1 ano**: ta pronto pra trabalhar
+- **Portfolio**: manda o link do GitHub no curriculo
+- **LinkedIn**: cria conta e posta seus projetos
 
 ---
 
-## QUANDO COMECAR A PROCURAR EMPREGO
+## 3 REGRAS PRA NAO DESISTIR
 
-- Com **6 meses** de estudo: comeca a mandar curriculo
-- Com **1 ano**: ja ta pronto pra trabalhar
-- Portfolio no GitHub: manda o link no curriculo
-- LinkedIn: cria conta e posta seus projetos
+1. **Sabado e domingo sao SAGRADOS** — estuda de manha, tarde e livre
+2. **Nao pula semana** — se um sabado deu ruim, no domingo voce recupera
+3. **Se errar, volta** — desistir e facil, voltar e o que te leva longe
 
 ---
 
-*"O segredo nao e motivação. E disciplina. Motivacao vai e volta. Disciplina te leva ate o fim."*
+*"Nao importa o ritmo. Importa nao parar."*
