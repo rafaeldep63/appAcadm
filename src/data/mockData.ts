@@ -1,16 +1,16 @@
 import { Exercise, GymClass, Student, Workout } from './types';
 
 export const mockExercises: Exercise[] = [
-  { id: '1', name: 'Supino Reto', muscle: 'Peito', equipment: 'Barra', description: 'Deitado no banco, empurre a barra para cima até estender os braços.' },
-  { id: '2', name: 'Agachamento Livre', muscle: 'Quadríceps', equipment: 'Barra', description: 'Com a barra nos ombros, agache flexionando os joelhos até 90°.' },
-  { id: '3', name: 'Levantamento Terra', muscle: 'Costas/Posterior', equipment: 'Barra', description: 'Pise sobre a barra, flexione os quadris e levante mantendo as costas retas.' },
-  { id: '4', name: 'Desenvolvimento', muscle: 'Ombros', equipment: 'Halteres', description: 'Sentado ou em pé, empurre os halteres acima da cabeça.' },
-  { id: '5', name: 'Rosca Direta', muscle: 'Bíceps', equipment: 'Barra', description: 'Em pé, flexione os cotovelos levantando a barra em direção aos ombros.' },
-  { id: '6', name: 'Tríceps Pulley', muscle: 'Tríceps', equipment: 'Polia', description: 'Empurre a barra para baixo estendendo os cotovelos.' },
-  { id: '7', name: 'Puxada Frontal', muscle: 'Costas', equipment: 'Polia', description: 'Puxe a barra para baixo em direção ao peito.' },
-  { id: '8', name: 'Leg Press', muscle: 'Quadríceps', equipment: 'Máquina', description: 'Empurre a plataforma com os pés estendendo os joelhos.' },
-  { id: '9', name: 'Elevação Lateral', muscle: 'Ombros', equipment: 'Halteres', description: 'Em pé, eleve os halteres lateralmente até a altura dos ombros.' },
-  { id: '10', name: 'Abdominal Crunch', muscle: 'Abdômen', equipment: 'Solo', description: 'Deitado, contraia o abdômen elevando os ombros do solo.' },
+  { id: '1', name: 'Supino Reto', muscle: 'Peito', equipment: 'Barra', description: 'Deitado no banco, empurre a barra para cima ate estender os bracos.', videoUrl: 'https://www.youtube.com/watch?v=VmB1G1K7v94' },
+  { id: '2', name: 'Agachamento Livre', muscle: 'Quadriceps', equipment: 'Barra', description: 'Com a barra nos ombros, agache flexionando os joelhos ate 90°.', videoUrl: 'https://www.youtube.com/watch?v=ultWZbUMPL8' },
+  { id: '3', name: 'Levantamento Terra', muscle: 'Costas/Posterior', equipment: 'Barra', description: 'Pise sobre a barra, flexione os quadris e levante mantendo as costas retas.', videoUrl: 'https://www.youtube.com/watch?v=op9kVnSo6Wc' },
+  { id: '4', name: 'Desenvolvimento', muscle: 'Ombros', equipment: 'Halteres', description: 'Sentado ou em pe, empurre os halteres acima da cabeca.', videoUrl: 'https://www.youtube.com/watch?v=qEwKCR5JCog' },
+  { id: '5', name: 'Rosca Direta', muscle: 'Biceps', equipment: 'Barra', description: 'Em pe, flexione os cotovelos levantando a barra em direcao aos ombros.', videoUrl: 'https://www.youtube.com/watch?v=kwG2ipFRgFo' },
+  { id: '6', name: 'Triceps Pulley', muscle: 'Triceps', equipment: 'Polia', description: 'Empurre a barra para baixo estendendo os cotovelos.', videoUrl: 'https://www.youtube.com/watch?v=2-LAMcpzODU' },
+  { id: '7', name: 'Puxada Frontal', muscle: 'Costas', equipment: 'Polia', description: 'Puxe a barra para baixo em direcao ao peito.', videoUrl: 'https://www.youtube.com/watch?v=CAwf7n6Luuc' },
+  { id: '8', name: 'Leg Press', muscle: 'Quadriceps', equipment: 'Maquina', description: 'Empurre a plataforma com os pes estendendo os joelhos.', videoUrl: 'https://www.youtube.com/watch?v=IZxyjW7MPJQ' },
+  { id: '9', name: 'Elevacao Lateral', muscle: 'Ombros', equipment: 'Halteres', description: 'Em pe, eleve os halteres lateralmente ate a altura dos ombros.', videoUrl: 'https://www.youtube.com/watch?v=3VcKaXpzqRo' },
+  { id: '10', name: 'Abdominal Crunch', muscle: 'Abdomen', equipment: 'Solo', description: 'Deitado, contraia o abdomen elevando os ombros do solo.', videoUrl: 'https://www.youtube.com/watch?v=Xyd_fa5zoEU' },
 ];
 
 export const mockWorkouts: Workout[] = [

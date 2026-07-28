@@ -13,6 +13,8 @@ export interface Exercise {
   equipment: string;
   description: string;
   image?: string;
+  videoUrl?: string;
+  gifUrl?: string;
 }
 
 export interface WorkoutSet {

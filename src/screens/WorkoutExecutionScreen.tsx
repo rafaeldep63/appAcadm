@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Linking,
 } from 'react-native';
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
 import { Workout, WorkoutExercise, WorkoutSet } from '../data/types';
@@ -131,7 +132,18 @@ export default function WorkoutExecutionScreen({ workout, onFinish }: Props) {
               </View>
 
               {exerciseIndex === currentExercise && (
-                <View style={styles.setsContainer}>
+                <>
+                  {we.exercise.videoUrl && (
+                    <TouchableOpacity
+                      style={styles.videoButton}
+                      onPress={() => Linking.openURL(we.exercise.videoUrl!)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.videoButtonIcon}>▶</Text>
+                      <Text style={styles.videoButtonText}>Ver como fazer</Text>
+                    </TouchableOpacity>
+                  )}
+                  <View style={styles.setsContainer}>
                   {we.sets.map((s, setIndex) => (
                     <View key={setIndex} style={[
                       styles.setItem,
@@ -201,8 +213,9 @@ export default function WorkoutExecutionScreen({ workout, onFinish }: Props) {
                 : 'Finalizar Treino'}
             </Text>
           </TouchableOpacity>
-        </View>
-      )}
+                </View>
+                </>
+              )}
     </View>
   );
 }
@@ -439,6 +452,26 @@ const styles = StyleSheet.create({
   doneSetCheck: {
     fontSize: 12,
     color: Colors.success,
+  },
+  videoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.danger + '15',
+    borderRadius: BorderRadius.sm,
+    padding: Spacing.sm,
+    marginTop: Spacing.sm,
+    gap: Spacing.sm,
+    borderWidth: 1,
+    borderColor: Colors.danger + '30',
+  },
+  videoButtonIcon: {
+    fontSize: 14,
+    color: Colors.danger,
+  },
+  videoButtonText: {
+    fontSize: FontSize.sm,
+    color: Colors.danger,
+    fontWeight: '600',
   },
   bottomBar: {
     flexDirection: 'row',
