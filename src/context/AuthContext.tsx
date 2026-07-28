@@ -11,15 +11,10 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>({
-    id: '1',
-    name: 'Admin',
-    email: 'admin@academia.com',
-    role: 'admin',
-  });
+  const [user, setUser] = useState<User | null>(null);
 
   const login = (email: string, password: string): boolean => {
-    if (email && password) {
+    if (email === 'admin@academia.com' && password === '123456') {
       setUser({
         id: '1',
         name: 'Admin',

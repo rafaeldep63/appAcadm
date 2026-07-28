@@ -113,6 +113,11 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.footer}>
+          <View style={styles.demoHint}>
+            <Text style={styles.demoHintTitle}>Dados de acesso:</Text>
+            <Text style={styles.demoHintText}>Email: admin@academia.com</Text>
+            <Text style={styles.demoHintText}>Senha: 123456</Text>
+          </View>
           <Text style={styles.footerText}>AcadApp v1.0</Text>
           <Text style={styles.footerText}>Powered by Rafael</Text>
         </View>
@@ -306,6 +311,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: Spacing.xxl,
     gap: Spacing.xs,
+  },
+  demoHint: {
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.md,
+    padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginBottom: Spacing.md,
+    alignItems: 'center',
+    width: '100%',
+  },
+  demoHintTitle: {
+    fontSize: FontSize.xs,
+    fontWeight: '600',
+    color: Colors.primary,
+    marginBottom: Spacing.xs,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  demoHintText: {
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
   },
   footerText: {
     fontSize: FontSize.xs,
