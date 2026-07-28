@@ -4,6 +4,7 @@ import { User } from '../data/types';
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => boolean;
+  register: (name: string, email: string, password: string) => boolean;
   logout: () => void;
   isAdmin: boolean;
   isAluno: boolean;
@@ -13,6 +14,18 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+
+  const register = (name: string, email: string, password: string): boolean => {
+    if (!name || !email || !password) return false;
+    const newUser: User = {
+      id: Date.now().toString(),
+      name,
+      email,
+      role: 'aluno',
+    };
+    setUser(newUser);
+    return true;
+  };
 
   const login = (email: string, password: string): boolean => {
     if (email === 'admin@academia.com' && password === '123456') {
@@ -44,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAluno = user?.role === 'aluno';
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAdmin, isAluno }}>
+    <AuthContext.Provider value={{ user, login, register, logout, isAdmin, isAluno }}>
       {children}
     </AuthContext.Provider>
   );

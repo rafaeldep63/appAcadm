@@ -15,20 +15,21 @@ import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
 
 const { width, height } = Dimensions.get('window');
 
-export default function LoginScreen({ navigation }: any) {
+export default function RegisterScreen({ navigation }: any) {
+  const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth();
+  const { register } = useAuth();
 
-  const handleLogin = () => {
-    if (!email || !password) {
+  const handleRegister = () => {
+    if (!nome || !email || !password) {
       Alert.alert('Atencao', 'Preencha todos os campos para continuar.');
       return;
     }
-    const success = login(email, password);
+    const success = register(nome, email, password);
     if (!success) {
-      Alert.alert('Erro', 'Email ou senha incorretos.');
+      Alert.alert('Erro', 'Nao foi possivel criar a conta.');
     }
   };
 
@@ -52,8 +53,23 @@ export default function LoginScreen({ navigation }: any) {
         </View>
 
         <View style={styles.formCard}>
-          <Text style={styles.formTitle}>Bem-vindo de volta</Text>
-          <Text style={styles.formSubtitle}>Entre com suas credenciais para acessar</Text>
+          <Text style={styles.formTitle}>Criar Conta</Text>
+          <Text style={styles.formSubtitle}>Preencha os dados para se cadastrar</Text>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>NOME</Text>
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputIcon}>◉</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Seu nome completo"
+                placeholderTextColor={Colors.textMuted}
+                value={nome}
+                onChangeText={setNome}
+                autoCapitalize="words"
+              />
+            </View>
+          </View>
 
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>EMAIL</Text>
@@ -92,12 +108,8 @@ export default function LoginScreen({ navigation }: any) {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.forgotPassword} onPress={() => Alert.alert('Recuperar Senha', 'Entre em contato com o administrador da academia para redefinir sua senha.')}>
-            <Text style={styles.forgotText}>Esqueceu a senha?</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.loginButtonText}>Entrar</Text>
+          <TouchableOpacity style={styles.loginButton} onPress={handleRegister}>
+            <Text style={styles.loginButtonText}>Cadastrar</Text>
             <Text style={styles.loginButtonArrow}>→</Text>
           </TouchableOpacity>
 
@@ -107,28 +119,12 @@ export default function LoginScreen({ navigation }: any) {
             <View style={styles.dividerLine} />
           </View>
 
-          <TouchableOpacity style={styles.registerButton} onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.registerText}>Criar nova conta</Text>
+          <TouchableOpacity style={styles.registerButton} onPress={() => navigation.goBack()}>
+            <Text style={styles.registerText}>Ja tem conta? Entrar</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.footer}>
-          <View style={styles.demoHint}>
-            <Text style={styles.demoHintTitle}>Contas de demonstracao:</Text>
-            <View style={styles.demoHintRow}>
-              <View style={styles.demoHintAccount}>
-                <Text style={styles.demoHintRole}>Admin</Text>
-                <Text style={styles.demoHintText}>admin@academia.com</Text>
-                <Text style={styles.demoHintText}>Senha: 123456</Text>
-              </View>
-              <View style={styles.demoHintDivider} />
-              <View style={styles.demoHintAccount}>
-                <Text style={styles.demoHintRole}>Aluno</Text>
-                <Text style={styles.demoHintText}>joao@email.com</Text>
-                <Text style={styles.demoHintText}>Senha: 123456</Text>
-              </View>
-            </View>
-          </View>
           <Text style={styles.footerText}>AcadApp v1.0</Text>
           <Text style={styles.footerText}>Powered by Rafael</Text>
         </View>
@@ -258,16 +254,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.textMuted,
   },
-  forgotPassword: {
-    alignItems: 'flex-end',
-    marginBottom: Spacing.lg,
-    marginTop: Spacing.xs,
-  },
-  forgotText: {
-    fontSize: FontSize.sm,
-    color: Colors.primary,
-    fontWeight: '500',
-  },
   loginButton: {
     backgroundColor: Colors.primary,
     borderRadius: BorderRadius.md,
@@ -322,48 +308,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: Spacing.xxl,
     gap: Spacing.xs,
-  },
-  demoHint: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    marginBottom: Spacing.md,
-    alignItems: 'center',
-    width: '100%',
-  },
-  demoHintTitle: {
-    fontSize: FontSize.xs,
-    fontWeight: '600',
-    color: Colors.primary,
-    marginBottom: Spacing.md,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  demoHintRow: {
-    flexDirection: 'row',
-    width: '100%',
-  },
-  demoHintAccount: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  demoHintDivider: {
-    width: 1,
-    backgroundColor: Colors.border,
-    marginHorizontal: Spacing.md,
-  },
-  demoHintRole: {
-    fontSize: FontSize.xs,
-    fontWeight: '700',
-    color: Colors.text,
-    marginBottom: Spacing.xs,
-  },
-  demoHintText: {
-    fontSize: FontSize.xs,
-    color: Colors.textSecondary,
-    marginTop: 2,
   },
   footerText: {
     fontSize: FontSize.xs,
