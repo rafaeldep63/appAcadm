@@ -114,9 +114,20 @@ export default function LoginScreen() {
 
         <View style={styles.footer}>
           <View style={styles.demoHint}>
-            <Text style={styles.demoHintTitle}>Dados de acesso:</Text>
-            <Text style={styles.demoHintText}>Email: admin@academia.com</Text>
-            <Text style={styles.demoHintText}>Senha: 123456</Text>
+            <Text style={styles.demoHintTitle}>Contas de demonstracao:</Text>
+            <View style={styles.demoHintRow}>
+              <View style={styles.demoHintAccount}>
+                <Text style={styles.demoHintRole}>Admin</Text>
+                <Text style={styles.demoHintText}>admin@academia.com</Text>
+                <Text style={styles.demoHintText}>Senha: 123456</Text>
+              </View>
+              <View style={styles.demoHintDivider} />
+              <View style={styles.demoHintAccount}>
+                <Text style={styles.demoHintRole}>Aluno</Text>
+                <Text style={styles.demoHintText}>joao@email.com</Text>
+                <Text style={styles.demoHintText}>Senha: 123456</Text>
+              </View>
+            </View>
           </View>
           <Text style={styles.footerText}>AcadApp v1.0</Text>
           <Text style={styles.footerText}>Powered by Rafael</Text>
@@ -326,13 +337,33 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xs,
     fontWeight: '600',
     color: Colors.primary,
-    marginBottom: Spacing.xs,
+    marginBottom: Spacing.md,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
+  demoHintRow: {
+    flexDirection: 'row',
+    width: '100%',
+  },
+  demoHintAccount: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  demoHintDivider: {
+    width: 1,
+    backgroundColor: Colors.border,
+    marginHorizontal: Spacing.md,
+  },
+  demoHintRole: {
+    fontSize: FontSize.xs,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: Spacing.xs,
+  },
   demoHintText: {
-    fontSize: FontSize.sm,
+    fontSize: FontSize.xs,
     color: Colors.textSecondary,
+    marginTop: 2,
   },
   footerText: {
     fontSize: FontSize.xs,

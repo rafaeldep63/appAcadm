@@ -6,6 +6,7 @@ interface AuthContextType {
   login: (email: string, password: string) => boolean;
   logout: () => void;
   isAdmin: boolean;
+  isAluno: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -23,6 +24,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       return true;
     }
+    if (email === 'joao@email.com' && password === '123456') {
+      setUser({
+        id: '2',
+        name: 'Joao Silva',
+        email,
+        role: 'aluno',
+      });
+      return true;
+    }
     return false;
   };
 
@@ -31,9 +41,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const isAdmin = user?.role === 'admin';
+  const isAluno = user?.role === 'aluno';
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAdmin }}>
+    <AuthContext.Provider value={{ user, login, logout, isAdmin, isAluno }}>
       {children}
     </AuthContext.Provider>
   );
