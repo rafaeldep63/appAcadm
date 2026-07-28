@@ -8,83 +8,89 @@ import {
   Dimensions,
 } from 'react-native';
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
-import { useWorkouts } from '../context/WorkoutContext';
-import { mockStudents } from '../data/mockData';
-import { StatCard, SectionHeader, Card, Badge } from '../components/UI';
+import { useData } from '../context/DataContext';
+import { Card, Badge } from '../components/UI';
 
 const { width } = Dimensions.get('window');
 
 export default function HomeScreen({ navigation }: any) {
-  const { workouts, isWorkoutComplete } = useWorkouts();
-  const activeStudents = mockStudents.filter((s) => s.status === 'ativo').length;
-  const totalExercises = workouts.reduce((acc, w) => acc + w.exercises.length, 0);
+  const { workouts, students, isWorkoutComplete, workoutHistory } = useData();
+  const activeStudents = students.filter((s) => s.status === 'ativo').length;
 
   const today: string = 'Segunda';
   const todayWorkouts = workouts.filter((w) => w.day === today);
   const todayDone = todayWorkouts.filter((w) => isWorkoutComplete(w.id, w.day)).length;
+  const totalExercises = workouts.reduce((acc, w) => acc + w.exercises.length, 0);
+  const totalSets = workouts.reduce((acc, w) => acc + w.exercises.reduce((a, e) => a + e.sets.length, 0), 0);
+  const monthlyWorkouts = workoutHistory.filter((h) => {
+    const d = new Date(h.date);
+    const now = new Date();
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
+
+  const stats = [
+    { icon: '●', value: String(activeStudents), label: 'Alunos Ativos', color: Colors.success, trend: `${students.length} total` },
+    { icon: '◈', value: String(workouts.length), label: 'Treinos', color: Colors.primary, trend: `${totalExercises} exercicios` },
+    { icon: '◉', value: String(monthlyWorkouts), label: 'Treinos no Mes', color: Colors.info, trend: 'ultimos 30 dias' },
+    { icon: '♦', value: `${todayDone}/${todayWorkouts.length}`, label: 'Concluidos Hoje', color: Colors.warning, trend: today },
+  ];
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <View>
           <Text style={styles.greeting}>Bom dia,</Text>
-          <Text style={styles.userName}>Admin</Text>
+          <Text style={styles.userName}>Administrador</Text>
         </View>
-        <TouchableOpacity style={styles.avatar}>
-          <Text style={styles.avatarText}>A</Text>
-          <View style={styles.avatarBadge} />
-        </TouchableOpacity>
+        <View style={styles.headerRight}>
+          <View style={styles.headerStat}>
+            <Text style={styles.headerStatValue}>{activeStudents}</Text>
+            <Text style={styles.headerStatLabel}>Alunos</Text>
+          </View>
+          <TouchableOpacity style={styles.avatar}>
+            <Text style={styles.avatarText}>A</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.statsGrid}>
-        <StatCard
-          icon="●"
-          value={activeStudents.toString()}
-          label="Alunos Ativos"
-          color={Colors.success}
-          trend="+2 esse mes"
-        />
-        <StatCard
-          icon="◈"
-          value={workouts.length.toString()}
-          label="Treinos Ativos"
-          color={Colors.primary}
-        />
-        <StatCard
-          icon="◎"
-          value={totalExercises.toString()}
-          label="Total Exercicios"
-          color={Colors.info}
-        />
-        <StatCard
-          icon="♦"
-          value={`${todayDone}/${todayWorkouts.length}`}
-          label="Treinos Hoje"
-          color={Colors.warning}
-          trend={today === 'Domingo' ? 'descanso' : `${today}`}
-        />
+        {stats.map((stat, index) => (
+          <View key={index} style={[styles.statCard, { borderLeftColor: stat.color }]}>
+            <View style={[styles.statIconContainer, { backgroundColor: stat.color + '20' }]}>
+              <Text style={[styles.statIcon, { color: stat.color }]}>{stat.icon}</Text>
+            </View>
+            <Text style={styles.statValue}>{stat.value}</Text>
+            <Text style={styles.statLabel}>{stat.label}</Text>
+            <Text style={[styles.statTrend, { color: stat.color }]}>{stat.trend}</Text>
+          </View>
+        ))}
       </View>
 
       <View style={styles.section}>
-        <SectionHeader title="Treinos de Hoje" action="Ver todos" onAction={() => navigation.navigate('Calendario')} />
+        <Text style={styles.sectionTitle}>Treinos de Hoje</Text>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionSubtitle}>{todayWorkouts.length} treino(s) agendados</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Calendario')}>
+            <Text style={styles.seeAll}>Ver todos</Text>
+          </TouchableOpacity>
+        </View>
         {todayWorkouts.length === 0 ? (
           <Card>
-            <Text style={styles.emptyText}>Nenhum treino para hoje</Text>
+            <Text style={styles.emptyText}>Nenhum treino agendado para hoje</Text>
           </Card>
         ) : (
           todayWorkouts.map((workout) => {
             const done = isWorkoutComplete(workout.id, workout.day);
             return (
-              <Card key={workout.id} style={styles.classCard}>
-                <View style={styles.classRow}>
-                  <View style={styles.classTimeBlock}>
-                    <Text style={styles.classDay}>{workout.day.slice(0, 3).toUpperCase()}</Text>
-                    <Text style={styles.classTime}>{workout.exercises.length}ex</Text>
+              <Card key={workout.id} style={[styles.workoutCard, done && styles.workoutCardDone]}>
+                <View style={styles.workoutRow}>
+                  <View style={[styles.workoutIcon, { backgroundColor: done ? Colors.successBg : Colors.primary + '20' }]}>
+                    <Text style={[styles.workoutIconText, { color: done ? Colors.success : Colors.primary }]}>◈</Text>
                   </View>
-                  <View style={styles.classInfo}>
-                    <Text style={styles.className}>{workout.name}</Text>
-                    <Text style={styles.classInstructor}>
-                      {workout.exercises.reduce((acc, we) => acc + we.sets.length, 0)} series
+                  <View style={styles.workoutInfo}>
+                    <Text style={[styles.workoutName, done && styles.textDone]}>{workout.name}</Text>
+                    <Text style={styles.workoutMeta}>
+                      {workout.exercises.length} exercicios • {workout.exercises.reduce((a, e) => a + e.sets.length, 0)} series
                     </Text>
                   </View>
                   <Badge
@@ -100,26 +106,50 @@ export default function HomeScreen({ navigation }: any) {
       </View>
 
       <View style={styles.section}>
-        <SectionHeader title="Atalhos Rapidos" />
+        <Text style={styles.sectionTitle}>Atalhos Rapidos</Text>
         <View style={styles.shortcutsGrid}>
           {[
-            { label: 'Treinos', icon: '◈', screen: 'Treinos', color: Colors.primary },
-            { label: 'Calendario', icon: '◎', screen: 'Calendario', color: Colors.info },
-            { label: 'Alunos', icon: '◉', screen: 'Alunos', color: Colors.success },
-            { label: 'Progresso', icon: '◆', screen: 'Progresso', color: Colors.warning },
+            { label: 'Treinos', icon: '◈', screen: 'Treinos', color: Colors.primary, count: workouts.length },
+            { label: 'Calendario', icon: '◎', screen: 'Calendario', color: Colors.info, count: `${todayDone}/${todayWorkouts.length}` },
+            { label: 'Alunos', icon: '◉', screen: 'Alunos', color: Colors.success, count: activeStudents },
+            { label: 'Progresso', icon: '◆', screen: 'Progresso', color: Colors.warning, count: `${monthlyWorkouts} mes` },
           ].map((shortcut, index) => (
             <TouchableOpacity
               key={index}
               style={styles.shortcutCard}
               onPress={() => navigation.navigate(shortcut.screen)}
+              activeOpacity={0.7}
             >
-              <View style={[styles.shortcutIcon, { backgroundColor: shortcut.color + '20' }]}>
-                <Text style={[styles.shortcutIconText, { color: shortcut.color }]}>{shortcut.icon}</Text>
+              <View style={[styles.shortcutIconContainer, { backgroundColor: shortcut.color + '20' }]}>
+                <Text style={[styles.shortcutIcon, { color: shortcut.color }]}>{shortcut.icon}</Text>
               </View>
               <Text style={styles.shortcutLabel}>{shortcut.label}</Text>
+              <Text style={[styles.shortcutCount, { color: shortcut.color }]}>{shortcut.count}</Text>
             </TouchableOpacity>
           ))}
         </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Ultimos Treinos</Text>
+        {workoutHistory.length === 0 ? (
+          <Card>
+            <Text style={styles.emptyText}>Nenhum treino realizado ainda</Text>
+          </Card>
+        ) : (
+          workoutHistory.slice(0, 3).map((entry) => (
+            <Card key={entry.id} style={styles.historyCard}>
+              <View style={styles.historyRow}>
+                <Text style={styles.historyIcon}>◈</Text>
+                <View style={styles.historyInfo}>
+                  <Text style={styles.historyName}>{entry.workoutName}</Text>
+                  <Text style={styles.historyDate}>{entry.date} • {entry.duration}min</Text>
+                </View>
+                <Badge text="FEITO" color={Colors.success} bgColor={Colors.successBg} />
+              </View>
+            </Card>
+          ))
+        )}
       </View>
 
       <View style={styles.bottomSpacer} />
@@ -128,150 +158,71 @@ export default function HomeScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
+  container: { flex: 1, backgroundColor: Colors.background },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.xxl,
-    paddingBottom: Spacing.md,
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingHorizontal: Spacing.lg, paddingTop: Spacing.xxl, paddingBottom: Spacing.md,
   },
-  greeting: {
-    fontSize: FontSize.md,
-    color: Colors.textSecondary,
-  },
-  userName: {
-    fontSize: FontSize.title,
-    fontWeight: 'bold',
-    color: Colors.text,
-    letterSpacing: -0.5,
-  },
+  greeting: { fontSize: FontSize.md, color: Colors.textSecondary },
+  userName: { fontSize: FontSize.title, fontWeight: 'bold', color: Colors.text, letterSpacing: -0.5 },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  headerStat: { alignItems: 'center' },
+  headerStatValue: { fontSize: FontSize.xl, fontWeight: 'bold', color: Colors.primary },
+  headerStatLabel: { fontSize: 10, color: Colors.textMuted, textTransform: 'uppercase' },
   avatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: Colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    width: 44, height: 44, borderRadius: 14, backgroundColor: Colors.primary,
+    justifyContent: 'center', alignItems: 'center',
   },
-  avatarText: {
-    color: Colors.white,
-    fontSize: FontSize.xl,
-    fontWeight: 'bold',
-  },
-  avatarBadge: {
-    position: 'absolute',
-    top: 2,
-    right: 2,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: Colors.success,
-    borderWidth: 2,
-    borderColor: Colors.primary,
-  },
+  avatarText: { color: Colors.white, fontSize: FontSize.xl, fontWeight: 'bold' },
   statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: Spacing.lg,
-    gap: Spacing.sm,
+    flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: Spacing.lg, gap: Spacing.sm,
   },
-  section: {
-    marginTop: Spacing.lg,
-    paddingHorizontal: Spacing.lg,
+  statCard: {
+    width: '48%', flexGrow: 1, backgroundColor: Colors.surface, borderRadius: BorderRadius.lg,
+    padding: Spacing.md, borderLeftWidth: 3, borderWidth: 1, borderColor: Colors.border,
   },
-  classCard: {
-    marginBottom: Spacing.sm,
+  statIconContainer: {
+    width: 36, height: 36, borderRadius: 10, justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.sm,
   },
-  classRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
+  statIcon: { fontSize: 18 },
+  statValue: { fontSize: FontSize.xxl, fontWeight: 'bold', color: Colors.text },
+  statLabel: { fontSize: FontSize.xs, color: Colors.textSecondary, marginTop: 2 },
+  statTrend: { fontSize: FontSize.xs, fontWeight: '600', marginTop: Spacing.xs },
+  section: { marginTop: Spacing.lg, paddingHorizontal: Spacing.lg },
+  sectionTitle: { fontSize: FontSize.lg, fontWeight: 'bold', color: Colors.text, marginBottom: 4 },
+  sectionHeader: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing.md,
   },
-  classTimeBlock: {
-    alignItems: 'center',
-    minWidth: 50,
-  },
-  classDay: {
-    fontSize: FontSize.xs,
-    fontWeight: '700',
-    color: Colors.primary,
-    letterSpacing: 1,
-  },
-  classTime: {
-    fontSize: FontSize.sm,
-    fontWeight: '600',
-    color: Colors.text,
-    marginTop: 2,
-  },
-  classInfo: {
-    flex: 1,
-  },
-  className: {
-    fontSize: FontSize.md,
-    fontWeight: '600',
-    color: Colors.text,
-  },
-  classInstructor: {
-    fontSize: FontSize.xs,
-    color: Colors.textSecondary,
-    marginTop: 2,
-  },
-  capacityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: Spacing.sm,
-    gap: Spacing.sm,
-  },
-  capacityText: {
-    fontSize: FontSize.xs,
-    color: Colors.textMuted,
-  },
+  sectionSubtitle: { fontSize: FontSize.sm, color: Colors.textSecondary },
+  seeAll: { fontSize: FontSize.sm, color: Colors.primary, fontWeight: '500' },
+  emptyText: { fontSize: FontSize.sm, color: Colors.textMuted, textAlign: 'center', paddingVertical: Spacing.lg },
+  workoutCard: { marginBottom: Spacing.sm },
+  workoutCardDone: { opacity: 0.7 },
+  workoutRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  workoutIcon: { width: 44, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+  workoutIconText: { fontSize: 20 },
+  workoutInfo: { flex: 1 },
+  workoutName: { fontSize: FontSize.md, fontWeight: '600', color: Colors.text },
+  textDone: { textDecorationLine: 'line-through', color: Colors.textMuted },
+  workoutMeta: { fontSize: FontSize.xs, color: Colors.textSecondary, marginTop: 2 },
   shortcutsGrid: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
+    flexDirection: 'row', gap: Spacing.sm,
   },
   shortcutCard: {
-    flex: 1,
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.md,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.border,
+    flex: 1, backgroundColor: Colors.surface, borderRadius: BorderRadius.lg, padding: Spacing.md,
+    alignItems: 'center', borderWidth: 1, borderColor: Colors.border,
   },
-  shortcutIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: Spacing.sm,
+  shortcutIconContainer: {
+    width: 42, height: 42, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.sm,
   },
-  shortcutIconText: {
-    fontSize: 20,
-  },
-  shortcutLabel: {
-    fontSize: FontSize.xs,
-    color: Colors.textSecondary,
-    fontWeight: '500',
-  },
-  bottomSpacer: {
-    height: Spacing.xxl,
-  },
-  emptyText: {
-    fontSize: FontSize.sm,
-    color: Colors.textMuted,
-    textAlign: 'center',
-    paddingVertical: Spacing.md,
-  },
+  shortcutIcon: { fontSize: 20 },
+  shortcutLabel: { fontSize: FontSize.xs, color: Colors.textSecondary, fontWeight: '500' },
+  shortcutCount: { fontSize: FontSize.sm, fontWeight: 'bold', marginTop: 4 },
+  historyCard: { marginBottom: Spacing.sm },
+  historyRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  historyIcon: { fontSize: 18, color: Colors.primary },
+  historyInfo: { flex: 1 },
+  historyName: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.text },
+  historyDate: { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: 2 },
+  bottomSpacer: { height: Spacing.xxl },
 });

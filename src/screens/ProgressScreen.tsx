@@ -8,161 +8,140 @@ import {
   Dimensions,
 } from 'react-native';
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
+import { useData } from '../context/DataContext';
 import { Card, SectionHeader, Badge, ProgressBar } from '../components/UI';
 
 const { width } = Dimensions.get('window');
 
-const mockProgressData = [
-  { id: '1', date: '2025-01-01', weight: 82, bodyFat: 18, chest: 100, waist: 85, arms: 35, notes: 'Otima evolucao' },
-  { id: '2', date: '2025-01-15', weight: 81, bodyFat: 17.5, chest: 101, waist: 84, arms: 35.5 },
-  { id: '3', date: '2025-02-01', weight: 80, bodyFat: 17, chest: 102, waist: 83, arms: 36, notes: 'Perdeu 2kg de gordura' },
-  { id: '4', date: '2025-02-15', weight: 79, bodyFat: 16.5, chest: 102, waist: 82, arms: 36.5 },
-];
-
-const weeklyWorkouts = [
-  { day: 'SEG', completed: true, duration: 60 },
-  { day: 'TER', completed: true, duration: 55 },
-  { day: 'QUA', completed: false, duration: 0 },
-  { day: 'QUI', completed: true, duration: 65 },
-  { day: 'SEX', completed: false, duration: 0 },
-  { day: 'SAB', completed: false, duration: 0 },
-  { day: 'DOM', completed: false, duration: 0 },
-];
-
 export default function ProgressScreen({ customNavigation }: any) {
-  const latest = mockProgressData[mockProgressData.length - 1];
-  const previous = mockProgressData[mockProgressData.length - 2];
-  const weightDiff = latest.weight - previous.weight;
-  const fatDiff = latest.bodyFat - previous.bodyFat;
-  const completedDays = weeklyWorkouts.filter((d) => d.completed).length;
-  const totalMinutes = weeklyWorkouts.reduce((acc, d) => acc + d.duration, 0);
+  const { students, workoutHistory } = useData();
+  const activeStudents = students.filter((s) => s.status === 'ativo').length;
+
+  const totalWorkouts = workoutHistory.length;
+  const monthWorkouts = workoutHistory.filter((h) => {
+    const d = new Date(h.date.split('/').reverse().join('-'));
+    const now = new Date();
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  });
+  const totalMinutes = monthWorkouts.reduce((acc, h) => acc + h.duration, 0);
+  const avgMinutes = monthWorkouts.length > 0 ? Math.round(totalMinutes / monthWorkouts.length) : 0;
+
+  const weekDays = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB', 'DOM'];
+  const weekCounts = weekDays.map((_, i) => {
+    const dayName = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'][i];
+    return workoutHistory.filter((h) => {
+      const d = new Date(h.date.split('/').reverse().join('-'));
+      const now = new Date();
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      return d >= weekAgo && new Date(h.date.split('/').reverse().join('-')).getDay() === (i + 1) % 7;
+    }).length;
+  });
+  const weekTotal = weekCounts.reduce((a, b) => a + b, 0);
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <Text style={styles.title}>Progresso</Text>
-        <Text style={styles.subtitle}>Evolucao de Joao Silva</Text>
+        <Text style={styles.title}>Progresso Geral</Text>
+        <Text style={styles.subtitle}>Visao geral da academia</Text>
       </View>
 
       <View style={styles.statsRow}>
-        <Card style={[styles.miniStat, { borderLeftColor: weightDiff <= 0 ? Colors.success : Colors.danger }]}>
-          <Text style={styles.miniStatLabel}>Peso</Text>
-          <Text style={styles.miniStatValue}>{latest.weight}kg</Text>
-          <Text style={[styles.miniStatDiff, { color: weightDiff <= 0 ? Colors.success : Colors.danger }]}>
-            {weightDiff > 0 ? '+' : ''}{weightDiff}kg
-          </Text>
-        </Card>
-        <Card style={[styles.miniStat, { borderLeftColor: fatDiff <= 0 ? Colors.success : Colors.danger }]}>
-          <Text style={styles.miniStatLabel}>Gordura</Text>
-          <Text style={styles.miniStatValue}>{latest.bodyFat}%</Text>
-          <Text style={[styles.miniStatDiff, { color: fatDiff <= 0 ? Colors.success : Colors.danger }]}>
-            {fatDiff > 0 ? '+' : ''}{fatDiff}%
-          </Text>
+        <Card style={[styles.miniStat, { borderLeftColor: Colors.primary }]}>
+          <Text style={styles.miniStatLabel}>Alunos Ativos</Text>
+          <Text style={styles.miniStatValue}>{activeStudents}</Text>
+          <Text style={[styles.miniStatDiff, { color: Colors.primary }]}>{students.length} total</Text>
         </Card>
         <Card style={[styles.miniStat, { borderLeftColor: Colors.info }]}>
-          <Text style={styles.miniStatLabel}>Treinos</Text>
-          <Text style={styles.miniStatValue}>{completedDays}/7</Text>
-          <Text style={[styles.miniStatDiff, { color: Colors.info }]}>{totalMinutes} min</Text>
+          <Text style={styles.miniStatLabel}>Treinos Mes</Text>
+          <Text style={styles.miniStatValue}>{monthWorkouts.length}</Text>
+          <Text style={[styles.miniStatDiff, { color: Colors.info }]}>{totalMinutes}min totais</Text>
+        </Card>
+        <Card style={[styles.miniStat, { borderLeftColor: Colors.success }]}>
+          <Text style={styles.miniStatLabel}>Media</Text>
+          <Text style={styles.miniStatValue}>{avgMinutes}min</Text>
+          <Text style={[styles.miniStatDiff, { color: Colors.success }]}>por treino</Text>
         </Card>
       </View>
 
       <View style={styles.section}>
-        <SectionHeader title="Semana Atual" />
+        <SectionHeader title="Frequencia Semanal" />
         <Card>
           <View style={styles.weekGrid}>
-            {weeklyWorkouts.map((day, index) => (
+            {weekDays.map((day, index) => (
               <View key={index} style={styles.dayColumn}>
-                <View style={[
-                  styles.dayCircle,
-                  day.completed ? styles.dayCircleCompleted : styles.dayCirclePending,
-                ]}>
-                  {day.completed && <Text style={styles.dayCheck}>✓</Text>}
+                <View style={[styles.dayCircle, weekCounts[index] > 0 && styles.dayCircleDone]}>
+                  {weekCounts[index] > 0 && <Text style={styles.dayCheck}>✓</Text>}
                 </View>
-                <Text style={styles.dayLabel}>{day.day}</Text>
-                {day.completed ? (
-                  <Text style={styles.dayDuration}>{day.duration}m</Text>
-                ) : (
-                  <Text style={styles.dayDash}>—</Text>
-                )}
+                <Text style={styles.dayLabel}>{day}</Text>
+                <Text style={styles.dayCount}>{weekCounts[index] > 0 ? `${weekCounts[index]}x` : '—'}</Text>
               </View>
             ))}
           </View>
           <View style={styles.weekSummary}>
-            <ProgressBar progress={(completedDays / 7) * 100} color={Colors.primary} height={6} />
+            <ProgressBar progress={(weekTotal / 7) * 100} color={Colors.primary} height={6} />
             <Text style={styles.weekSummaryText}>
-              {completedDays} de 7 dias • {totalMinutes} minutos totais
+              {weekTotal} treinos essa semana • {weekTotal >= 3 ? 'Meta atingida! 🎯' : 'Faltam ' + (3 - weekTotal) + ' para a meta'}
             </Text>
           </View>
         </Card>
       </View>
 
       <View style={styles.section}>
-        <SectionHeader title="Medidas Corporais" />
-        <Card>
-          {[
-            { label: 'Peso', value: `${latest.weight}kg`, prev: `${previous.weight}kg`, icon: '⚖' },
-            { label: 'Gordura Corporal', value: `${latest.bodyFat}%`, prev: `${previous.bodyFat}%`, icon: '◆' },
-            { label: 'Peito', value: `${latest.chest}cm`, prev: `${previous.chest}cm`, icon: '◈' },
-            { label: 'Cintura', value: `${latest.waist}cm`, prev: `${previous.waist}cm`, icon: '◎' },
-            { label: 'Bracos', value: `${latest.arms}cm`, prev: `${previous.arms}cm`, icon: '♦' },
-          ].map((item, index) => (
-            <View key={index}>
-              <View style={styles.measureRow}>
-                <View style={styles.measureIconContainer}>
-                  <Text style={styles.measureIcon}>{item.icon}</Text>
+        <SectionHeader title="Ranking de Alunos" />
+        {students
+          .filter((s) => s.status === 'ativo')
+          .sort((a, b) => {
+            const aCount = workoutHistory.filter((h) => h.studentId === a.id).length;
+            const bCount = workoutHistory.filter((h) => h.studentId === b.id).length;
+            return bCount - aCount;
+          })
+          .slice(0, 5)
+          .map((student, index) => {
+            const count = workoutHistory.filter((h) => h.studentId === student.id).length;
+            return (
+              <Card key={student.id} style={styles.rankCard}>
+                <View style={styles.rankRow}>
+                  <View style={[styles.rankBadge, index === 0 && styles.rankGold, index === 1 && styles.rankSilver, index === 2 && styles.rankBronze]}>
+                    <Text style={styles.rankNumber}>{index + 1}</Text>
+                  </View>
+                  <View style={styles.rankInfo}>
+                    <Text style={styles.rankName}>{student.name}</Text>
+                    <Text style={styles.rankPlan}>{student.plan}</Text>
+                  </View>
+                  <Text style={styles.rankCount}>{count} treinos</Text>
                 </View>
-                <View style={styles.measureInfo}>
-                  <Text style={styles.measureLabel}>{item.label}</Text>
-                  <Text style={styles.measurePrev}>anterior: {item.prev}</Text>
-                </View>
-                <Text style={styles.measureValue}>{item.value}</Text>
-              </View>
-              {index < 4 && <View style={styles.measureDivider} />}
-            </View>
-          ))}
-        </Card>
+              </Card>
+            );
+          })}
       </View>
 
       <View style={styles.section}>
-        <SectionHeader title="Historico de Medidas" />
-        {mockProgressData.map((entry, index) => (
-          <Card key={entry.id} style={styles.historyCard}>
-            <View style={styles.historyRow}>
-              <View style={styles.historyDateBlock}>
-                <Text style={styles.historyDay}>{entry.date.split('-')[2]}</Text>
-                <Text style={styles.historyMonth}>
-                  {['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][parseInt(entry.date.split('-')[1]) - 1]}
-                </Text>
-              </View>
-              <View style={styles.historyDivider} />
-              <View style={styles.historyInfo}>
-                <View style={styles.historyMetrics}>
-                  <View style={styles.historyMetric}>
-                    <Text style={styles.historyMetricLabel}>Peso</Text>
-                    <Text style={styles.historyMetricValue}>{entry.weight}kg</Text>
-                  </View>
-                  <View style={styles.historyMetric}>
-                    <Text style={styles.historyMetricLabel}>Gordura</Text>
-                    <Text style={styles.historyMetricValue}>{entry.bodyFat}%</Text>
-                  </View>
-                  <View style={styles.historyMetric}>
-                    <Text style={styles.historyMetricLabel}>Bracos</Text>
-                    <Text style={styles.historyMetricValue}>{entry.arms}cm</Text>
-                  </View>
-                </View>
-                {entry.notes && (
-                  <View style={styles.historyNote}>
-                    <Text style={styles.historyNoteText}>{entry.notes}</Text>
-                  </View>
-                )}
-              </View>
-            </View>
+        <SectionHeader title="Ultimos Treinos Realizados" />
+        {workoutHistory.length === 0 ? (
+          <Card>
+            <Text style={styles.emptyText}>Nenhum treino realizado ainda</Text>
           </Card>
-        ))}
+        ) : (
+          workoutHistory.slice(0, 5).map((entry) => (
+            <Card key={entry.id} style={styles.historyCard}>
+              <View style={styles.historyRow}>
+                <View style={styles.historyDateBlock}>
+                  <Text style={styles.historyDay}>{entry.date.split('/')[0]}</Text>
+                  <Text style={styles.historyMonth}>{entry.date.split('/')[1]}</Text>
+                </View>
+                <View style={styles.historyDivider} />
+                <View style={styles.historyInfo}>
+                  <Text style={styles.historyName}>{entry.workoutName}</Text>
+                  <Text style={styles.historyDuration}>{Math.floor(entry.duration / 60)}min {entry.duration % 60}s</Text>
+                </View>
+              </View>
+            </Card>
+          ))
+        )}
       </View>
 
       <TouchableOpacity style={styles.addButton} activeOpacity={0.8} onPress={() => customNavigation?.navigate('AddMeasurement')}>
-        <Text style={styles.addButtonText}>+ Registrar Novas Medidas</Text>
+        <Text style={styles.addButtonText}>+ Registrar Medidas</Text>
       </TouchableOpacity>
 
       <View style={styles.bottomSpacer} />
@@ -171,229 +150,57 @@ export default function ProgressScreen({ customNavigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.xxl,
-    paddingBottom: Spacing.sm,
-  },
-  title: {
-    fontSize: FontSize.title,
-    fontWeight: 'bold',
-    color: Colors.text,
-    letterSpacing: -0.5,
-  },
-  subtitle: {
-    fontSize: FontSize.sm,
-    color: Colors.textSecondary,
-    marginTop: Spacing.xs,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    paddingHorizontal: Spacing.lg,
-    gap: Spacing.sm,
-  },
-  miniStat: {
-    flex: 1,
-    borderLeftWidth: 3,
-  },
-  miniStatLabel: {
-    fontSize: FontSize.xs,
-    color: Colors.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  miniStatValue: {
-    fontSize: FontSize.xl,
-    fontWeight: 'bold',
-    color: Colors.text,
-    marginTop: Spacing.xs,
-  },
-  miniStatDiff: {
-    fontSize: FontSize.xs,
-    fontWeight: '600',
-    marginTop: 2,
-  },
-  section: {
-    marginTop: Spacing.lg,
-    paddingHorizontal: Spacing.lg,
-  },
-  weekGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: Spacing.md,
-  },
-  dayColumn: {
-    alignItems: 'center',
-  },
+  container: { flex: 1, backgroundColor: Colors.background },
+  header: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.xxl, paddingBottom: Spacing.sm },
+  title: { fontSize: FontSize.title, fontWeight: 'bold', color: Colors.text, letterSpacing: -0.5 },
+  subtitle: { fontSize: FontSize.sm, color: Colors.textSecondary, marginTop: Spacing.xs },
+  statsRow: { flexDirection: 'row', paddingHorizontal: Spacing.lg, gap: Spacing.sm },
+  miniStat: { flex: 1, borderLeftWidth: 3 },
+  miniStatLabel: { fontSize: FontSize.xs, color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 },
+  miniStatValue: { fontSize: FontSize.xl, fontWeight: 'bold', color: Colors.text, marginTop: Spacing.xs },
+  miniStatDiff: { fontSize: FontSize.xs, fontWeight: '600', marginTop: 2 },
+  section: { marginTop: Spacing.lg, paddingHorizontal: Spacing.lg },
+  weekGrid: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: Spacing.md },
+  dayColumn: { alignItems: 'center' },
   dayCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: 36, height: 36, borderRadius: 12, backgroundColor: Colors.background,
+    borderWidth: 1.5, borderColor: Colors.border, justifyContent: 'center', alignItems: 'center',
   },
-  dayCircleCompleted: {
-    backgroundColor: Colors.success,
+  dayCircleDone: { backgroundColor: Colors.success, borderColor: Colors.success },
+  dayCheck: { color: Colors.white, fontSize: 14, fontWeight: 'bold' },
+  dayLabel: { fontSize: 10, fontWeight: '600', color: Colors.textSecondary, marginTop: Spacing.xs, letterSpacing: 0.5 },
+  dayCount: { fontSize: 10, color: Colors.textMuted, marginTop: 2 },
+  weekSummary: { borderTopWidth: 1, borderTopColor: Colors.border, paddingTop: Spacing.md },
+  weekSummaryText: { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: Spacing.sm },
+  rankCard: { marginBottom: Spacing.sm },
+  rankRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  rankBadge: {
+    width: 32, height: 32, borderRadius: 10, backgroundColor: Colors.background,
+    justifyContent: 'center', alignItems: 'center',
   },
-  dayCirclePending: {
-    backgroundColor: Colors.background,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-  },
-  dayCheck: {
-    color: Colors.white,
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  dayLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: Colors.textSecondary,
-    marginTop: Spacing.xs,
-    letterSpacing: 0.5,
-  },
-  dayDuration: {
-    fontSize: 10,
-    color: Colors.textMuted,
-    marginTop: 2,
-  },
-  dayDash: {
-    fontSize: 10,
-    color: Colors.textMuted,
-    marginTop: 2,
-  },
-  weekSummary: {
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-    paddingTop: Spacing.md,
-  },
-  weekSummaryText: {
-    fontSize: FontSize.xs,
-    color: Colors.textMuted,
-    marginTop: Spacing.sm,
-  },
-  measureRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: Spacing.sm,
-    gap: Spacing.md,
-  },
-  measureIconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: Colors.background,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  measureIcon: {
-    fontSize: 14,
-    color: Colors.textMuted,
-  },
-  measureInfo: {
-    flex: 1,
-  },
-  measureLabel: {
-    fontSize: FontSize.sm,
-    color: Colors.text,
-    fontWeight: '500',
-  },
-  measurePrev: {
-    fontSize: FontSize.xs,
-    color: Colors.textMuted,
-  },
-  measureValue: {
-    fontSize: FontSize.md,
-    fontWeight: 'bold',
-    color: Colors.primary,
-  },
-  measureDivider: {
-    height: 1,
-    backgroundColor: Colors.border,
-    marginLeft: 48,
-  },
-  historyCard: {
-    marginBottom: Spacing.sm,
-  },
-  historyRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-  },
-  historyDateBlock: {
-    alignItems: 'center',
-    minWidth: 50,
-  },
-  historyDay: {
-    fontSize: FontSize.xxl,
-    fontWeight: 'bold',
-    color: Colors.primary,
-  },
-  historyMonth: {
-    fontSize: FontSize.xs,
-    color: Colors.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  historyDivider: {
-    width: 1,
-    height: 50,
-    backgroundColor: Colors.border,
-  },
-  historyInfo: {
-    flex: 1,
-  },
-  historyMetrics: {
-    flexDirection: 'row',
-    gap: Spacing.lg,
-  },
-  historyMetric: {},
-  historyMetricLabel: {
-    fontSize: 10,
-    color: Colors.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  historyMetricValue: {
-    fontSize: FontSize.sm,
-    fontWeight: '600',
-    color: Colors.text,
-    marginTop: 2,
-  },
-  historyNote: {
-    marginTop: Spacing.sm,
-    paddingLeft: Spacing.sm,
-    borderLeftWidth: 2,
-    borderLeftColor: Colors.primary + '40',
-  },
-  historyNoteText: {
-    fontSize: FontSize.xs,
-    color: Colors.primary,
-    fontStyle: 'italic',
-  },
+  rankGold: { backgroundColor: Colors.warning },
+  rankSilver: { backgroundColor: '#8E8E9A' },
+  rankBronze: { backgroundColor: '#CD7F32' },
+  rankNumber: { fontSize: FontSize.sm, fontWeight: 'bold', color: Colors.white },
+  rankInfo: { flex: 1 },
+  rankName: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.text },
+  rankPlan: { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: 2 },
+  rankCount: { fontSize: FontSize.sm, fontWeight: 'bold', color: Colors.primary },
+  historyCard: { marginBottom: Spacing.sm },
+  historyRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  historyDateBlock: { alignItems: 'center', minWidth: 40 },
+  historyDay: { fontSize: FontSize.lg, fontWeight: 'bold', color: Colors.primary },
+  historyMonth: { fontSize: FontSize.xs, color: Colors.textMuted, textTransform: 'uppercase' },
+  historyDivider: { width: 1, height: 40, backgroundColor: Colors.border },
+  historyInfo: { flex: 1 },
+  historyName: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.text },
+  historyDuration: { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: 2 },
+  emptyText: { fontSize: FontSize.sm, color: Colors.textMuted, textAlign: 'center', paddingVertical: Spacing.lg },
   addButton: {
-    backgroundColor: Colors.primary,
-    marginHorizontal: Spacing.lg,
-    marginTop: Spacing.lg,
-    borderRadius: BorderRadius.lg,
-    paddingVertical: Spacing.md,
-    alignItems: 'center',
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    backgroundColor: Colors.primary, marginHorizontal: Spacing.lg, marginTop: Spacing.lg,
+    borderRadius: BorderRadius.lg, paddingVertical: Spacing.md, alignItems: 'center',
+    shadowColor: Colors.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6,
   },
-  addButtonText: {
-    color: Colors.white,
-    fontSize: FontSize.md,
-    fontWeight: '600',
-  },
-  bottomSpacer: {
-    height: Spacing.xxl,
-  },
+  addButtonText: { color: Colors.white, fontSize: FontSize.md, fontWeight: '600' },
+  bottomSpacer: { height: Spacing.xxl },
 });

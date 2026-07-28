@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, View, StyleSheet } from 'react-native';
 import { Colors, FontSize, BorderRadius } from '../theme';
-import { useWorkouts } from '../context/WorkoutContext';
+import { useData } from '../context/DataContext';
 import { Workout } from '../data/types';
 
 import StudentHomeScreen from '../screens/StudentHomeScreen';
@@ -59,7 +59,7 @@ function TabNavigator({ customNavigation }: any) {
 export default function StudentNavigator() {
   const [screen, setScreen] = useState<string>('tabs');
   const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
-  const { workouts } = useWorkouts();
+  const { workouts } = useData();
 
   const goBack = () => setScreen('tabs');
 

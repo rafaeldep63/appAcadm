@@ -9,6 +9,8 @@ import {
   Alert,
 } from 'react-native';
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
+import { useData } from '../context/DataContext';
+import { useAuth } from '../context/AuthContext';
 import { Card } from '../components/UI';
 
 interface Props {
@@ -23,12 +25,25 @@ export default function AddMeasurementScreen({ onBack }: Props) {
   const [arms, setArms] = useState('');
   const [thighs, setThighs] = useState('');
   const [notes, setNotes] = useState('');
+  const { addMeasurement } = useData();
+  const { user } = useAuth();
 
   const handleSave = () => {
     if (!weight) {
       Alert.alert('Erro', 'Preencha pelo menos o peso.');
       return;
     }
+    addMeasurement(user?.id || 'anonymous', {
+      id: Date.now().toString(),
+      date: new Date().toLocaleDateString('pt-BR'),
+      weight: parseFloat(weight),
+      bodyFat: bodyFat ? parseFloat(bodyFat) : undefined,
+      chest: chest ? parseFloat(chest) : undefined,
+      waist: waist ? parseFloat(waist) : undefined,
+      arms: arms ? parseFloat(arms) : undefined,
+      thighs: thighs ? parseFloat(thighs) : undefined,
+      notes: notes || undefined,
+    });
     Alert.alert('Sucesso', 'Medidas registradas com sucesso!', [
       { text: 'OK', onPress: onBack },
     ]);
@@ -58,9 +73,7 @@ export default function AddMeasurementScreen({ onBack }: Props) {
       <ScrollView showsVerticalScrollIndicator={false} style={styles.content}>
         <View style={styles.dateSection}>
           <Text style={styles.dateLabel}>DATA</Text>
-          <Text style={styles.dateValue}>
-            {new Date().toLocaleDateString('pt-BR')}
-          </Text>
+          <Text style={styles.dateValue}>{new Date().toLocaleDateString('pt-BR')}</Text>
         </View>
 
         <View style={styles.fieldsGrid}>
@@ -114,171 +127,57 @@ export default function AddMeasurementScreen({ onBack }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
+  container: { flex: 1, backgroundColor: Colors.background },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.xxl,
-    paddingBottom: Spacing.md,
-    gap: Spacing.md,
+    flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.xxl, paddingBottom: Spacing.md, gap: Spacing.md,
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: Colors.surface,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.border,
+    width: 40, height: 40, borderRadius: 12, backgroundColor: Colors.surface,
+    justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: Colors.border,
   },
-  backIcon: {
-    fontSize: 24,
-    color: Colors.text,
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: FontSize.xl,
-    fontWeight: 'bold',
-    color: Colors.text,
-  },
+  backIcon: { fontSize: 24, color: Colors.text },
+  headerTitle: { flex: 1, fontSize: FontSize.xl, fontWeight: 'bold', color: Colors.text },
   saveButton: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-    borderRadius: BorderRadius.sm,
+    backgroundColor: Colors.primary, paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, borderRadius: BorderRadius.sm,
   },
-  saveText: {
-    color: Colors.white,
-    fontSize: FontSize.sm,
-    fontWeight: '600',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: Spacing.lg,
-  },
+  saveText: { color: Colors.white, fontSize: FontSize.sm, fontWeight: '600' },
+  content: { flex: 1, paddingHorizontal: Spacing.lg },
   dateSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    marginBottom: Spacing.lg,
-    borderWidth: 1,
-    borderColor: Colors.border,
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    backgroundColor: Colors.surface, borderRadius: BorderRadius.md, padding: Spacing.md,
+    marginBottom: Spacing.lg, borderWidth: 1, borderColor: Colors.border,
   },
-  dateLabel: {
-    fontSize: FontSize.xs,
-    color: Colors.textMuted,
-    letterSpacing: 1,
-  },
-  dateValue: {
-    fontSize: FontSize.md,
-    fontWeight: '600',
-    color: Colors.text,
-  },
-  fieldsGrid: {
-    gap: Spacing.sm,
-  },
-  fieldCard: {
-    marginBottom: 0,
-  },
-  fieldHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: Spacing.sm,
-    gap: Spacing.sm,
-  },
+  dateLabel: { fontSize: FontSize.xs, color: Colors.textMuted, letterSpacing: 1 },
+  dateValue: { fontSize: FontSize.md, fontWeight: '600', color: Colors.text },
+  fieldsGrid: { gap: Spacing.sm },
+  fieldCard: { marginBottom: 0 },
+  fieldHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: Spacing.sm, gap: Spacing.sm },
   fieldIconContainer: {
-    width: 28,
-    height: 28,
-    borderRadius: 8,
-    backgroundColor: Colors.background,
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: 28, height: 28, borderRadius: 8, backgroundColor: Colors.background,
+    justifyContent: 'center', alignItems: 'center',
   },
-  fieldIcon: {
-    fontSize: 12,
-    color: Colors.textMuted,
-  },
-  fieldLabelContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  fieldLabel: {
-    fontSize: FontSize.sm,
-    fontWeight: '500',
-    color: Colors.textSecondary,
-  },
-  requiredDot: {
-    fontSize: FontSize.xs,
-    color: Colors.danger,
-    marginLeft: 4,
-  },
+  fieldIcon: { fontSize: 12, color: Colors.textMuted },
+  fieldLabelContainer: { flexDirection: 'row', alignItems: 'center' },
+  fieldLabel: { fontSize: FontSize.sm, fontWeight: '500', color: Colors.textSecondary },
+  requiredDot: { fontSize: FontSize.xs, color: Colors.danger, marginLeft: 4 },
   fieldInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.background,
-    borderRadius: BorderRadius.sm,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    paddingHorizontal: Spacing.md,
+    flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.background,
+    borderRadius: BorderRadius.sm, borderWidth: 1, borderColor: Colors.border, paddingHorizontal: Spacing.md,
   },
-  fieldInput: {
-    flex: 1,
-    paddingVertical: Spacing.md,
-    fontSize: FontSize.lg,
-    fontWeight: '600',
-    color: Colors.text,
-  },
-  fieldUnit: {
-    fontSize: FontSize.sm,
-    color: Colors.textMuted,
-  },
-  notesCard: {
-    marginTop: Spacing.md,
-  },
-  notesLabel: {
-    fontSize: FontSize.xs,
-    fontWeight: '600',
-    color: Colors.textMuted,
-    letterSpacing: 1,
-    marginBottom: Spacing.sm,
-  },
+  fieldInput: { flex: 1, paddingVertical: Spacing.md, fontSize: FontSize.lg, fontWeight: '600', color: Colors.text },
+  fieldUnit: { fontSize: FontSize.sm, color: Colors.textMuted },
+  notesCard: { marginTop: Spacing.md },
+  notesLabel: { fontSize: FontSize.xs, fontWeight: '600', color: Colors.textMuted, letterSpacing: 1, marginBottom: Spacing.sm },
   notesInput: {
-    backgroundColor: Colors.background,
-    borderRadius: BorderRadius.sm,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    padding: Spacing.md,
-    fontSize: FontSize.sm,
-    color: Colors.text,
-    minHeight: 80,
-    textAlignVertical: 'top',
+    backgroundColor: Colors.background, borderRadius: BorderRadius.sm, borderWidth: 1, borderColor: Colors.border,
+    padding: Spacing.md, fontSize: FontSize.sm, color: Colors.text, minHeight: 80, textAlignVertical: 'top',
   },
   saveButtonLarge: {
-    backgroundColor: Colors.primary,
-    borderRadius: BorderRadius.lg,
-    paddingVertical: Spacing.md,
-    alignItems: 'center',
-    marginTop: Spacing.xl,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    backgroundColor: Colors.primary, borderRadius: BorderRadius.lg, paddingVertical: Spacing.md,
+    alignItems: 'center', marginTop: Spacing.xl,
+    shadowColor: Colors.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6,
   },
-  saveButtonText: {
-    color: Colors.white,
-    fontSize: FontSize.md,
-    fontWeight: '600',
-  },
-  bottomSpacer: {
-    height: Spacing.xxl,
-  },
+  saveButtonText: { color: Colors.white, fontSize: FontSize.md, fontWeight: '600' },
+  bottomSpacer: { height: Spacing.xxl },
 });
