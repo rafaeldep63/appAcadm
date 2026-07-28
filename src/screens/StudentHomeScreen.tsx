@@ -14,7 +14,7 @@ import { Card, Badge, SectionHeader, ProgressBar, StatCard } from '../components
 
 const { width } = Dimensions.get('window');
 
-export default function StudentHomeScreen() {
+export default function StudentHomeScreen({ navigation }: any) {
   const { user, logout } = useAuth();
 
   const nextClass = mockClasses[0];
@@ -79,7 +79,7 @@ export default function StudentHomeScreen() {
             </View>
           ))}
 
-          <TouchableOpacity style={styles.startButton} activeOpacity={0.8}>
+          <TouchableOpacity style={styles.startButton} activeOpacity={0.8} onPress={() => navigation?.navigate('WorkoutExecution', { workout: todayWorkout })}>
             <Text style={styles.startButtonText}>Iniciar Treino</Text>
             <Text style={styles.startButtonArrow}>→</Text>
           </TouchableOpacity>

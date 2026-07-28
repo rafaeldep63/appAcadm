@@ -13,7 +13,7 @@ import { mockWorkouts } from '../data/mockData';
 import { Workout } from '../data/types';
 import { Card, Badge, SectionHeader, EmptyState } from '../components/UI';
 
-export default function WorkoutsScreen() {
+export default function WorkoutsScreen({ navigation }: any) {
   const [search, setSearch] = useState('');
   const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
 
@@ -138,7 +138,7 @@ export default function WorkoutsScreen() {
         )}
       </ScrollView>
 
-      <TouchableOpacity style={styles.fab} activeOpacity={0.8}>
+      <TouchableOpacity style={styles.fab} activeOpacity={0.8} onPress={() => navigation?.navigate('AddWorkout')}>
         <Text style={styles.fabIcon}>+</Text>
       </TouchableOpacity>
     </View>
