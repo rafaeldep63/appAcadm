@@ -18,7 +18,8 @@ export default function StudentHomeScreen({ navigation, customNavigation }: any)
   const { user, logout } = useAuth();
   const { workouts, isWorkoutComplete, workoutHistory } = useData();
 
-  const today: string = 'Segunda';
+  const daysOrder = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'];
+  const today: string = daysOrder[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
   const todayWorkouts = workouts.filter((w) => w.day === today);
   const todayWorkout = todayWorkouts[0];
   const completedCount = workoutHistory.filter((h) => {
@@ -104,6 +105,35 @@ export default function StudentHomeScreen({ navigation, customNavigation }: any)
             <Text style={styles.noWorkoutText}>Nenhum treino agendado para hoje</Text>
           </Card>
         )}
+      </View>
+
+      <View style={styles.section}>
+        <SectionHeader title="Sua Semana" />
+        <Card>
+          <View style={styles.weekGrid}>
+            {daysOrder.map((day, index) => {
+              const dayWorkout = workouts.find((w) => w.day === day);
+              const isDone = dayWorkout ? isWorkoutComplete(dayWorkout.id, day) : false;
+              const isToday = day === today;
+              return (
+                <View key={index} style={[styles.weekDayItem, isToday && styles.weekDayToday]}>
+                  <View style={[styles.weekDayCircle, isDone && styles.weekDayDone, isToday && styles.weekDayCircleToday]}>
+                    {isDone ? (
+                      <Text style={styles.weekDayCheck}>✓</Text>
+                    ) : (
+                      <Text style={[styles.weekDayLetter, isToday && styles.weekDayLetterToday]}>
+                        {day.slice(0, 3).toUpperCase()}
+                      </Text>
+                    )}
+                  </View>
+                  <Text style={[styles.weekDayName, isToday && styles.weekDayNameToday]}>
+                    {dayWorkout ? dayWorkout.name.slice(0, 6) : '—'}
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
+        </Card>
       </View>
 
       <View style={styles.section}>
@@ -244,6 +274,22 @@ const styles = StyleSheet.create({
   progressMetricDivider: { width: 1, height: 40, backgroundColor: Colors.border, marginVertical: Spacing.xs },
   progressSummary: { borderTopWidth: 1, borderTopColor: Colors.border, paddingTop: Spacing.md },
   progressSummaryText: { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: Spacing.sm },
+  weekGrid: {
+    flexDirection: 'row', justifyContent: 'space-between',
+  },
+  weekDayItem: { alignItems: 'center', gap: Spacing.xs },
+  weekDayToday: {},
+  weekDayCircle: {
+    width: 36, height: 36, borderRadius: 10, backgroundColor: Colors.background,
+    justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: Colors.border,
+  },
+  weekDayDone: { backgroundColor: Colors.success, borderColor: Colors.success },
+  weekDayCircleToday: { borderColor: Colors.primary, backgroundColor: Colors.primary + '15' },
+  weekDayCheck: { fontSize: 14, color: Colors.white, fontWeight: 'bold' },
+  weekDayLetter: { fontSize: 9, fontWeight: '700', color: Colors.textMuted, letterSpacing: 0.5 },
+  weekDayLetterToday: { color: Colors.primary },
+  weekDayName: { fontSize: 8, color: Colors.textMuted, textAlign: 'center' },
+  weekDayNameToday: { color: Colors.primary, fontWeight: '600' },
   tipCard: { marginBottom: Spacing.sm },
   tipRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   tipIcon: { fontSize: 24 },

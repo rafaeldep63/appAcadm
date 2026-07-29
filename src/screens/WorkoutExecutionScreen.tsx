@@ -27,7 +27,7 @@ export default function WorkoutExecutionScreen({ workout, onFinish }: Props) {
   );
   const [timer, setTimer] = useState(0);
   const [isRunning, setIsRunning] = useState(true);
-  const { addWorkoutHistory } = useData();
+  const { addWorkoutHistory, toggleWorkoutComplete, workouts } = useData();
   const { user } = useAuth();
   const startTime = useRef(Date.now());
 
@@ -75,11 +75,19 @@ export default function WorkoutExecutionScreen({ workout, onFinish }: Props) {
         duration,
         completed: true,
       });
-      Alert.alert(
-        'Parabens!',
-        `Treino concluido em ${Math.floor(duration / 60)}min ${duration % 60}s!`,
-        [{ text: 'Finalizar', onPress: onFinish }]
-      );
+      toggleWorkoutComplete(workout.id, workout.day);
+
+      const daysOrder = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'];
+      const currentDayIndex = daysOrder.indexOf(workout.day);
+      const nextWorkout = daysOrder.slice(currentDayIndex + 1).reduce((found, day) => {
+        return found || workouts.find((w) => w.day === day) || null;
+      }, null as Workout | null);
+
+      const msg = nextWorkout
+        ? `Treino concluido em ${Math.floor(duration / 60)}min ${duration % 60}s!\n\nProximo treino: ${nextWorkout.name} (${nextWorkout.day})`
+        : `Treino concluido em ${Math.floor(duration / 60)}min ${duration % 60}s!\n\nVoce completou todos os treinos da semana!`;
+
+      Alert.alert('Parabens!', msg, [{ text: 'Finalizar', onPress: onFinish }]);
     }
   };
 
