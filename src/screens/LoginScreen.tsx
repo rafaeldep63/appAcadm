@@ -11,7 +11,8 @@ import {
   Dimensions,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
+import { Colors, Spacing, BorderRadius, FontSize, Shadow } from '../theme';
+import { GradientButton } from '../components/UI';
 
 const { width, height } = Dimensions.get('window');
 
@@ -96,10 +97,7 @@ export default function LoginScreen({ navigation }: any) {
             <Text style={styles.forgotText}>Esqueceu a senha?</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.loginButtonText}>Entrar</Text>
-            <Text style={styles.loginButtonArrow}>→</Text>
-          </TouchableOpacity>
+          <GradientButton title="Entrar" onPress={handleLogin} icon="→" style={{ marginTop: Spacing.md }} />
 
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
