@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Workout, Student, Measurement } from '../data/types';
 import { mockWorkouts, mockStudents } from '../data/mockData';
 
@@ -28,14 +29,65 @@ export interface WorkoutHistory {
   completed: boolean;
 }
 
+const STORAGE_KEYS = {
+  workouts: '@appAcadm_workouts',
+  students: '@appAcadm_students',
+  completedWorkouts: '@appAcadm_completedWorkouts',
+  workoutHistory: '@appAcadm_workoutHistory',
+  studentMeasurements: '@appAcadm_studentMeasurements',
+};
+
 const DataContext = createContext<DataContextType>({} as DataContextType);
 
+async function loadData<T>(key: string, fallback: T): Promise<T> {
+  try {
+    const raw = await AsyncStorage.getItem(key);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {
+    console.warn('Error loading', key, e);
+  }
+  return fallback;
+}
+
+async function saveData(key: string, data: any) {
+  try {
+    await AsyncStorage.setItem(key, JSON.stringify(data));
+  } catch (e) {
+    console.warn('Error saving', key, e);
+  }
+}
+
 export function DataProvider({ children }: { children: ReactNode }) {
-  const [workouts, setWorkouts] = useState<Workout[]>([...mockWorkouts]);
-  const [students, setStudents] = useState<Student[]>([...mockStudents]);
+  const [loaded, setLoaded] = useState(false);
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
   const [completedWorkouts, setCompletedWorkouts] = useState<Record<string, boolean>>({});
   const [workoutHistory, setWorkoutHistory] = useState<WorkoutHistory[]>([]);
   const [studentMeasurements, setStudentMeasurements] = useState<Record<string, Measurement[]>>({});
+
+  useEffect(() => {
+    (async () => {
+      const [w, s, c, h, m] = await Promise.all([
+        loadData<Workout[]>(STORAGE_KEYS.workouts, mockWorkouts),
+        loadData<Student[]>(STORAGE_KEYS.students, mockStudents),
+        loadData<Record<string, boolean>>(STORAGE_KEYS.completedWorkouts, {}),
+        loadData<WorkoutHistory[]>(STORAGE_KEYS.workoutHistory, []),
+        loadData<Record<string, Measurement[]>>(STORAGE_KEYS.studentMeasurements, {}),
+      ]);
+      setWorkouts(w);
+      setStudents(s);
+      setCompletedWorkouts(c);
+      setWorkoutHistory(h);
+      setStudentMeasurements(m);
+      setLoaded(true);
+    })();
+  }, []);
+
+  useEffect(() => { if (loaded) saveData(STORAGE_KEYS.workouts, workouts); }, [workouts, loaded]);
+  useEffect(() => { if (loaded) saveData(STORAGE_KEYS.students, students); }, [students, loaded]);
+  useEffect(() => { if (loaded) saveData(STORAGE_KEYS.completedWorkouts, completedWorkouts); }, [completedWorkouts, loaded]);
+  useEffect(() => { if (loaded) saveData(STORAGE_KEYS.workoutHistory, workoutHistory); }, [workoutHistory, loaded]);
+  useEffect(() => { if (loaded) saveData(STORAGE_KEYS.studentMeasurements, studentMeasurements); }, [studentMeasurements, loaded]);
 
   const addWorkout = useCallback((workout: Workout) => {
     setWorkouts((prev) => [...prev, workout]);
@@ -83,7 +135,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       workoutHistory, addWorkoutHistory,
       studentMeasurements, addMeasurement,
     }}>
-      {children}
+      {loaded ? children : null}
     </DataContext.Provider>
   );
 }
