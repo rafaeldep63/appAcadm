@@ -98,10 +98,11 @@ export default function WorkoutExecutionScreen({ workout, onFinish }: Props) {
         <TouchableOpacity style={styles.closeButton} onPress={() => {
           Alert.alert('Sair do Treino', 'Tem certeza que quer sair?', [
             { text: 'Cancelar', style: 'cancel' },
-            { text: 'Sair', style: 'destructive', onPress },
+            { text: 'Sair', style: 'destructive', onPress: onFinish },
           ]);
-        }}>
+        
           <Text style={styles.closeIcon}>✕</Text>
+          }}>
         </TouchableOpacity>
         <View style={styles.headerInfo}>
           <Text style={styles.headerTitle}>{workout.name}</Text>
