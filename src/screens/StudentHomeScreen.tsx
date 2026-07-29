@@ -14,7 +14,7 @@ import { Card, Badge, SectionHeader, ProgressBar } from '../components/UI';
 
 const { width } = Dimensions.get('window');
 
-export default function StudentHomeScreen({ customNavigation }: any) {
+export default function StudentHomeScreen({ navigation, customNavigation }: any) {
   const { user, logout } = useAuth();
   const { workouts, isWorkoutComplete, workoutHistory } = useData();
 
@@ -65,7 +65,7 @@ export default function StudentHomeScreen({ customNavigation }: any) {
       </View>
 
       <View style={styles.section}>
-        <SectionHeader title="Treino de Hoje" action="Ver todos" onAction={() => customNavigation?.navigate('Treinos')} />
+        <SectionHeader title="Treino de Hoje" action="Ver todos" onAction={() => navigation?.navigate('Treinos')} />
         {todayWorkout ? (
           <Card style={styles.workoutCard}>
             <View style={styles.workoutHeader}>
@@ -131,7 +131,7 @@ export default function StudentHomeScreen({ customNavigation }: any) {
       </View>
 
       <View style={styles.section}>
-        <SectionHeader title="Seu Progresso" action="Ver detalhes" onAction={() => customNavigation?.navigate('Progresso')} />
+        <SectionHeader title="Seu Progresso" action="Ver detalhes" onAction={() => navigation?.navigate('Progresso')} />
         <Card>
           <View style={styles.progressHeader}>
             <Text style={styles.progressTitle}>Evolucao</Text>
