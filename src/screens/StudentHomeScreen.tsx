@@ -24,6 +24,13 @@ export default function StudentHomeScreen({ navigation, customNavigation }: any)
   const today: string = daysOrder[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
   const todayWorkouts = myWorkouts.filter((w) => w.day === today);
   const todayWorkout = todayWorkouts[0];
+  const isTodayDone = todayWorkout ? isWorkoutComplete(todayWorkout.id, today) : false;
+
+  const nextWorkout = isTodayDone
+    ? daysOrder.slice(daysOrder.indexOf(today) + 1).reduce((found, day) => {
+        return found || myWorkouts.find((w) => w.day === day) || null;
+      }, null as any)
+    : null;
   const completedCount = workoutHistory.filter((h) => {
     const d = new Date(h.date.split('/').reverse().join('-'));
     const now = new Date();
@@ -93,14 +100,20 @@ export default function StudentHomeScreen({ navigation, customNavigation }: any)
                 </View>
               </View>
             ))}
-            <TouchableOpacity
-              style={styles.startButton}
-              activeOpacity={0.8}
-              onPress={() => customNavigation?.navigate('WorkoutExecution', { workout: todayWorkout })}
-            >
-              <Text style={styles.startButtonText}>Iniciar Treino</Text>
-              <Text style={styles.startButtonArrow}>→</Text>
-            </TouchableOpacity>
+            {isTodayDone ? (
+              <View style={[styles.startButton, { backgroundColor: Colors.success }]}>
+                <Text style={styles.startButtonText}>Feito ✓</Text>
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={styles.startButton}
+                activeOpacity={0.8}
+                onPress={() => customNavigation?.navigate('WorkoutExecution', { workout: todayWorkout })}
+              >
+                <Text style={styles.startButtonText}>Iniciar Treino</Text>
+                <Text style={styles.startButtonArrow}>→</Text>
+              </TouchableOpacity>
+            )}
           </Card>
         ) : (
           <Card>
@@ -108,6 +121,34 @@ export default function StudentHomeScreen({ navigation, customNavigation }: any)
           </Card>
         )}
       </View>
+
+      {nextWorkout && (
+        <View style={styles.section}>
+          <SectionHeader title="Proximo Treino" />
+          <Card style={[styles.workoutCard, { borderColor: Colors.warning, borderWidth: 1.5 }]}>
+            <View style={styles.workoutHeader}>
+              <View style={[styles.workoutIconContainer, { backgroundColor: Colors.warning + '20' }]}>
+                <Text style={[styles.workoutIcon, { color: Colors.warning }]}>→</Text>
+              </View>
+              <View style={styles.workoutInfo}>
+                <Text style={styles.workoutName}>{nextWorkout.name}</Text>
+                <Text style={styles.workoutMeta}>{nextWorkout.day} • {nextWorkout.exercises.length} exercicios</Text>
+              </View>
+            </View>
+            {nextWorkout.exercises.slice(0, 3).map((we, index) => (
+              <View key={index} style={styles.exerciseItem}>
+                <View style={styles.exerciseNumber}>
+                  <Text style={styles.exerciseNumberText}>{index + 1}</Text>
+                </View>
+                <View style={styles.exerciseInfo}>
+                  <Text style={styles.exerciseName}>{we.exercise.name}</Text>
+                  <Text style={styles.exerciseDetail}>{we.sets.length}x{we.sets[0].reps} • {we.sets[0].weight}kg</Text>
+                </View>
+              </View>
+            ))}
+          </Card>
+        </View>
+      )}
 
       <View style={styles.section}>
         <SectionHeader title="Sua Semana" />

@@ -71,11 +71,17 @@ export default function AddMeasurementScreen({ onBack }: Props) {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} style={styles.content}>
-        <View style={styles.dateSection}>
-          <Text style={styles.dateLabel}>DATA</Text>
-          <Text style={styles.dateValue}>{new Date().toLocaleDateString('pt-BR')}</Text>
-        </View>
-
+        <Card style={styles.userCard}>
+          <View style={styles.userRow}>
+            <View style={styles.userAvatar}>
+              <Text style={styles.userAvatarText}>{user?.name?.charAt(0) || '?'}</Text>
+            </View>
+            <View>
+              <Text style={styles.userName}>{user?.name || 'Usuario'}</Text>
+              <Text style={styles.userDate}>{new Date().toLocaleDateString('pt-BR')}</Text>
+            </View>
+          </View>
+        </Card>
         <View style={styles.fieldsGrid}>
           {fields.map((field, index) => (
             <Card key={index} style={styles.fieldCard}>
@@ -173,6 +179,15 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background, borderRadius: BorderRadius.sm, borderWidth: 1, borderColor: Colors.border,
     padding: Spacing.md, fontSize: FontSize.sm, color: Colors.text, minHeight: 80, textAlignVertical: 'top',
   },
+  userCard: { marginBottom: Spacing.md },
+  userRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  userAvatar: {
+    width: 44, height: 44, borderRadius: 12, backgroundColor: Colors.primary,
+    justifyContent: 'center', alignItems: 'center',
+  },
+  userAvatarText: { fontSize: FontSize.lg, fontWeight: 'bold', color: Colors.white },
+  userName: { fontSize: FontSize.md, fontWeight: '600', color: Colors.text },
+  userDate: { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: 2 },
   saveButtonLarge: {
     backgroundColor: Colors.primary, borderRadius: BorderRadius.lg, paddingVertical: Spacing.md,
     alignItems: 'center', marginTop: Spacing.xl,
