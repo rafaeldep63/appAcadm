@@ -9,6 +9,8 @@ import {
   Alert,
 } from 'react-native';
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
+import { useData } from '../context/DataContext';
+import { useAuth } from '../context/AuthContext';
 import { mockExercises } from '../data/mockData';
 import { Exercise, Workout, WorkoutSet } from '../data/types';
 import { Card, Badge } from '../components/UI';
@@ -19,8 +21,11 @@ interface Props {
 }
 
 export default function AddWorkoutScreen({ onBack, onSave }: Props) {
+  const { students } = useData();
+  const { user, isAdmin } = useAuth();
   const [name, setName] = useState('');
   const [selectedDay, setSelectedDay] = useState('Segunda');
+  const [assignedTo, setAssignedTo] = useState(isAdmin ? (students[0]?.id || '') : (user?.id || ''));
   const [selectedExercises, setSelectedExercises] = useState<{ exercise: Exercise; reps: string; weight: string; sets: string }[]>([]);
 
   const days = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'];
@@ -48,6 +53,10 @@ export default function AddWorkoutScreen({ onBack, onSave }: Props) {
       Alert.alert('Erro', 'Digite o nome do treino.');
       return;
     }
+    if (isAdmin && !assignedTo) {
+      Alert.alert('Erro', 'Selecione um aluno para receber o treino.');
+      return;
+    }
     if (selectedExercises.length === 0) {
       Alert.alert('Erro', 'Adicione pelo menos 1 exercicio.');
       return;
@@ -56,6 +65,7 @@ export default function AddWorkoutScreen({ onBack, onSave }: Props) {
       id: Date.now().toString(),
       name,
       day: selectedDay,
+      assignedTo,
       exercises: selectedExercises.map((se) => ({
         exercise: se.exercise,
         sets: Array.from({ length: parseInt(se.sets) || 3 }, (): WorkoutSet => ({
@@ -106,6 +116,25 @@ export default function AddWorkoutScreen({ onBack, onSave }: Props) {
             ))}
           </View>
         </Card>
+
+        {isAdmin && (
+          <Card style={styles.formCard}>
+            <Text style={styles.label}>ALUNO</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.studentRow}>
+              {students.map((s) => (
+                <TouchableOpacity
+                  key={s.id}
+                  style={[styles.studentChip, assignedTo === s.id && styles.studentChipActive]}
+                  onPress={() => setAssignedTo(s.id)}
+                >
+                  <Text style={[styles.studentChipText, assignedTo === s.id && styles.studentChipTextActive]}>
+                    {s.name.split(' ')[0]}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </Card>
+        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Exercicios Adicionados ({selectedExercises.length})</Text>
@@ -369,6 +398,14 @@ const styles = StyleSheet.create({
     color: Colors.success,
     fontWeight: 'bold',
   },
+  studentRow: { flexDirection: 'row', gap: Spacing.sm },
+  studentChip: {
+    paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm, borderRadius: BorderRadius.sm,
+    backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border,
+  },
+  studentChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
+  studentChipText: { fontSize: FontSize.sm, color: Colors.textSecondary, fontWeight: '500' },
+  studentChipTextActive: { color: Colors.white },
   bottomSpacer: {
     height: Spacing.xxl,
   },

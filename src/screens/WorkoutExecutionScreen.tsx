@@ -29,6 +29,7 @@ export default function WorkoutExecutionScreen({ workout, onFinish }: Props) {
   const [isRunning, setIsRunning] = useState(true);
   const { addWorkoutHistory, toggleWorkoutComplete, workouts } = useData();
   const { user } = useAuth();
+  const myWorkouts = user?.role === 'admin' ? workouts : workouts.filter((w) => w.assignedTo === user?.id);
   const startTime = useRef(Date.now());
 
   useEffect(() => {
@@ -80,7 +81,7 @@ export default function WorkoutExecutionScreen({ workout, onFinish }: Props) {
       const daysOrder = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'];
       const currentDayIndex = daysOrder.indexOf(workout.day);
       const nextWorkout = daysOrder.slice(currentDayIndex + 1).reduce((found, day) => {
-        return found || workouts.find((w) => w.day === day) || null;
+        return found || myWorkouts.find((w) => w.day === day) || null;
       }, null as Workout | null);
 
       const msg = nextWorkout

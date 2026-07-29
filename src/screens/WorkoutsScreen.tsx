@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
 import { useData } from '../context/DataContext';
+import { useAuth } from '../context/AuthContext';
 import { Workout } from '../data/types';
 import { Card, Badge, EmptyState } from '../components/UI';
 
@@ -18,10 +19,12 @@ export default function WorkoutsScreen({ customNavigation }: any) {
   const [dayFilter, setDayFilter] = useState<string | null>(null);
   const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
   const { workouts, deleteWorkout } = useData();
+  const { user } = useAuth();
+  const myWorkouts = user?.role === 'admin' ? workouts : workouts.filter((w) => w.assignedTo === user?.id);
 
   const days = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'];
 
-  const filteredWorkouts = workouts.filter((w) => {
+  const filteredWorkouts = myWorkouts.filter((w) => {
     const matchSearch = w.name.toLowerCase().includes(search.toLowerCase());
     const matchDay = !dayFilter || w.day === dayFilter;
     return matchSearch && matchDay;
@@ -123,7 +126,7 @@ export default function WorkoutsScreen({ customNavigation }: any) {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Treinos</Text>
-        <Text style={styles.subtitle}>{workouts.length} treinos cadastrados</Text>
+        <Text style={styles.subtitle}>{myWorkouts.length} treinos cadastrados</Text>
       </View>
 
       <View style={styles.searchRow}>

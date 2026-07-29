@@ -29,7 +29,9 @@ export interface WorkoutHistory {
   completed: boolean;
 }
 
+const STORAGE_VERSION = 2;
 const STORAGE_KEYS = {
+  version: '@appAcadm_version',
   workouts: '@appAcadm_workouts',
   students: '@appAcadm_students',
   completedWorkouts: '@appAcadm_completedWorkouts',
@@ -67,13 +69,34 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     (async () => {
-      const [w, s, c, h, m] = await Promise.all([
-        loadData<Workout[]>(STORAGE_KEYS.workouts, mockWorkouts),
-        loadData<Student[]>(STORAGE_KEYS.students, mockStudents),
-        loadData<Record<string, boolean>>(STORAGE_KEYS.completedWorkouts, {}),
-        loadData<WorkoutHistory[]>(STORAGE_KEYS.workoutHistory, []),
-        loadData<Record<string, Measurement[]>>(STORAGE_KEYS.studentMeasurements, {}),
-      ]);
+      const savedVersion = await AsyncStorage.getItem(STORAGE_KEYS.version);
+      const needsReset = savedVersion !== String(STORAGE_VERSION);
+
+      let w, s, c, h, m;
+      if (needsReset) {
+        w = mockWorkouts;
+        s = mockStudents;
+        c = {};
+        h = [];
+        m = {};
+        await AsyncStorage.setItem(STORAGE_KEYS.version, String(STORAGE_VERSION));
+        await Promise.all([
+          saveData(STORAGE_KEYS.workouts, w),
+          saveData(STORAGE_KEYS.students, s),
+          saveData(STORAGE_KEYS.completedWorkouts, c),
+          saveData(STORAGE_KEYS.workoutHistory, h),
+          saveData(STORAGE_KEYS.studentMeasurements, m),
+        ]);
+      } else {
+        [w, s, c, h, m] = await Promise.all([
+          loadData<Workout[]>(STORAGE_KEYS.workouts, mockWorkouts),
+          loadData<Student[]>(STORAGE_KEYS.students, mockStudents),
+          loadData<Record<string, boolean>>(STORAGE_KEYS.completedWorkouts, {}),
+          loadData<WorkoutHistory[]>(STORAGE_KEYS.workoutHistory, []),
+          loadData<Record<string, Measurement[]>>(STORAGE_KEYS.studentMeasurements, {}),
+        ]);
+      }
+
       setWorkouts(w);
       setStudents(s);
       setCompletedWorkouts(c);

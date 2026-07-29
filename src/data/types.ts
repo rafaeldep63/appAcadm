@@ -34,6 +34,7 @@ export interface Workout {
   name: string;
   day: string;
   exercises: WorkoutExercise[];
+  assignedTo: string;
 }
 
 export interface WorkoutPlan {

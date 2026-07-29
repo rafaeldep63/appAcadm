@@ -18,9 +18,11 @@ export default function StudentHomeScreen({ navigation, customNavigation }: any)
   const { user, logout } = useAuth();
   const { workouts, isWorkoutComplete, workoutHistory } = useData();
 
+  const myWorkouts = workouts.filter((w) => w.assignedTo === user?.id);
+
   const daysOrder = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'];
   const today: string = daysOrder[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
-  const todayWorkouts = workouts.filter((w) => w.day === today);
+  const todayWorkouts = myWorkouts.filter((w) => w.day === today);
   const todayWorkout = todayWorkouts[0];
   const completedCount = workoutHistory.filter((h) => {
     const d = new Date(h.date.split('/').reverse().join('-'));
@@ -60,7 +62,7 @@ export default function StudentHomeScreen({ navigation, customNavigation }: any)
         </Card>
         <Card style={styles.miniStat}>
           <Text style={styles.miniStatLabel}>Treinos</Text>
-          <Text style={styles.miniStatValue}>{workouts.length}</Text>
+          <Text style={styles.miniStatValue}>{myWorkouts.length}</Text>
           <Text style={[styles.miniStatDiff, { color: Colors.info }]}>disponiveis</Text>
         </Card>
       </View>
@@ -112,7 +114,7 @@ export default function StudentHomeScreen({ navigation, customNavigation }: any)
         <Card>
           <View style={styles.weekGrid}>
             {daysOrder.map((day, index) => {
-              const dayWorkout = workouts.find((w) => w.day === day);
+              const dayWorkout = myWorkouts.find((w) => w.day === day);
               const isDone = dayWorkout ? isWorkoutComplete(dayWorkout.id, day) : false;
               const isToday = day === today;
               return (

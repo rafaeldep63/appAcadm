@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
 import { useData } from '../context/DataContext';
+import { useAuth } from '../context/AuthContext';
 import { Card, Badge, EmptyState } from '../components/UI';
 
 const days = [
@@ -23,8 +24,10 @@ const days = [
 export default function WorkoutCalendarScreen() {
   const [selectedDay, setSelectedDay] = useState('Segunda');
   const { workouts, isWorkoutComplete, toggleWorkoutComplete } = useData();
+  const { user } = useAuth();
+  const myWorkouts = user?.role === 'admin' ? workouts : workouts.filter((w) => w.assignedTo === user?.id);
 
-  const dayWorkouts = workouts.filter((w) => w.day === selectedDay);
+  const dayWorkouts = myWorkouts.filter((w) => w.day === selectedDay);
   const completedCount = dayWorkouts.filter((w) => isWorkoutComplete(w.id, w.day)).length;
 
   return (
@@ -39,7 +42,7 @@ export default function WorkoutCalendarScreen() {
         style={styles.daysContainer} contentContainerStyle={styles.daysContent}
       >
         {days.map((day) => {
-          const count = workouts.filter((w) => w.day === day.key).length;
+          const count = myWorkouts.filter((w) => w.day === day.key).length;
           return (
             <TouchableOpacity
               key={day.key}
