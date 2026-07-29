@@ -14,7 +14,7 @@ import RegisterScreen from './src/screens/RegisterScreen';
 const Stack = createNativeStackNavigator();
 
 function RootNavigator() {
-  const { user, isAdmin, isAluno } = useAuth();
+  const { currentUser: user, isAdmin, isAluno } = useAuth();
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

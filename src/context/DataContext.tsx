@@ -6,6 +6,7 @@ import { mockWorkouts, mockStudents } from '../data/mockData';
 interface DataContextType {
   workouts: Workout[];
   addWorkout: (workout: Workout) => void;
+  updateWorkout: (id: string, data: Workout) => void;
   deleteWorkout: (id: string) => void;
   students: Student[];
   addStudent: (student: Student) => void;
@@ -72,7 +73,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const savedVersion = await AsyncStorage.getItem(STORAGE_KEYS.version);
       const needsReset = savedVersion !== String(STORAGE_VERSION);
 
-      let w, s, c, h, m;
+      let w: Workout[];
+      let s: Student[];
+      let c: Record<string, boolean>;
+      let h: WorkoutHistory[];
+      let m: Record<string, Measurement[]>;
       if (needsReset) {
         w = mockWorkouts;
         s = mockStudents;
@@ -116,6 +121,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setWorkouts((prev) => [...prev, workout]);
   }, []);
 
+  const updateWorkout = useCallback((id: string, data: Workout) => {
+    setWorkouts((prev) => prev.map((w) => (w.id === id ? { ...w, ...data, id } : w)));
+  }, []);
+
   const deleteWorkout = useCallback((id: string) => {
     setWorkouts((prev) => prev.filter((w) => w.id !== id));
   }, []);
@@ -152,7 +161,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   return (
     <DataContext.Provider value={{
-      workouts, addWorkout, deleteWorkout,
+      workouts, addWorkout, updateWorkout, deleteWorkout,
       students, addStudent, updateStudent,
       completedWorkouts, toggleWorkoutComplete, isWorkoutComplete,
       workoutHistory, addWorkoutHistory,

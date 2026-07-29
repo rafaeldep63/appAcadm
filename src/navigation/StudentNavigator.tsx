@@ -47,7 +47,7 @@ function TabNavigator({ customNavigation }: any) {
           {(props) => {
             if (tab.name === 'Home') return <StudentHomeScreen {...props} customNavigation={customNavigation} />;
             if (tab.name === 'Treinos') return <WorkoutsScreen {...props} customNavigation={customNavigation} />;
-            if (tab.name === 'Calendario') return <WorkoutCalendarScreen {...props} />;
+            if (tab.name === 'Calendario') return <WorkoutCalendarScreen />;
             if (tab.name === 'Progresso') return <ProgressScreen {...props} customNavigation={customNavigation} />;
             return null;
           }}
@@ -60,9 +60,13 @@ function TabNavigator({ customNavigation }: any) {
 export default function StudentNavigator() {
   const [screen, setScreen] = useState<string>('tabs');
   const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
-  const { workouts, addWorkout } = useData();
+  const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null);
+  const { workouts, addWorkout, updateWorkout } = useData();
 
-  const goBack = () => setScreen('tabs');
+  const goBack = () => {
+    setEditingWorkout(null);
+    setScreen('tabs');
+  };
 
   if (screen === 'workoutExecution' && selectedWorkout) {
     return (
@@ -79,9 +83,12 @@ export default function StudentNavigator() {
   if (screen === 'addWorkout') {
     return (
       <AddWorkoutScreen
+        workout={editingWorkout || undefined}
         onBack={goBack}
-        onSave={(workout) => {
-          addWorkout(workout);
+        onSave={(workout: Workout) => {
+          if (editingWorkout) updateWorkout(editingWorkout.id, workout);
+          else addWorkout(workout);
+          setEditingWorkout(null);
           goBack();
         }}
       />
@@ -97,6 +104,10 @@ export default function StudentNavigator() {
       customNavigation={{
         navigate: (name: string, params?: any) => {
           if (name === 'AddWorkout') {
+            setEditingWorkout(null);
+            setScreen('addWorkout');
+          } else if (name === 'EditWorkout') {
+            setEditingWorkout(params?.workout || null);
             setScreen('addWorkout');
           } else if (name === 'WorkoutExecution') {
             setSelectedWorkout(params?.workout || workouts[0]);

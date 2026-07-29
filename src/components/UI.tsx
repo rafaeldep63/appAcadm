@@ -1,17 +1,24 @@
 import React from 'react';
-import { View, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
+import { View, Text, StyleSheet, ViewStyle, StyleProp, TouchableOpacity } from 'react-native';
+import { Colors, Spacing, BorderRadius, FontSize, Shadow } from '../theme';
 
 interface CardProps {
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   padding?: number;
   marginBottom?: number;
+  highlight?: boolean;
 }
 
-export function Card({ children, style, padding = Spacing.md, marginBottom = Spacing.sm }: CardProps) {
+export function Card({ children, style, padding = Spacing.md, marginBottom = Spacing.sm, highlight }: CardProps) {
   return (
-    <View style={[styles.card, { padding, marginBottom }, style]}>
+    <View style={[
+      styles.card,
+      highlight && styles.cardHighlight,
+      { padding, marginBottom },
+      Shadow.sm,
+      style,
+    ]}>
       {children}
     </View>
   );
@@ -42,13 +49,15 @@ interface StatCardProps {
 
 export function StatCard({ icon, value, label, color, trend }: StatCardProps) {
   return (
-    <View style={[styles.statCard, { borderLeftColor: color }]}>
+    <View style={[styles.statCard, { borderLeftColor: color }, Shadow.sm]}>
       <View style={[styles.statIconContainer, { backgroundColor: color + '20' }]}>
         <Text style={[styles.statIcon, { color }]}>{icon}</Text>
       </View>
       <Text style={styles.statValue}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
-      {trend && <Text style={[styles.statTrend, { color: trend.startsWith('+') ? Colors.success : Colors.danger }]}>{trend}</Text>}
+      {trend && (
+        <Text style={[styles.statTrend, { color: Colors.textMuted }]}>{trend}</Text>
+      )}
     </View>
   );
 }
@@ -62,7 +71,9 @@ interface EmptyStateProps {
 export function EmptyState({ icon, title, description }: EmptyStateProps) {
   return (
     <View style={styles.emptyState}>
-      <Text style={styles.emptyIcon}>{icon}</Text>
+      <View style={styles.emptyIconContainer}>
+        <Text style={styles.emptyIcon}>{icon}</Text>
+      </View>
       <Text style={styles.emptyTitle}>{title}</Text>
       <Text style={styles.emptyDesc}>{description}</Text>
     </View>
@@ -80,7 +91,9 @@ export function SectionHeader({ title, action, onAction }: SectionHeaderProps) {
     <View style={styles.sectionHeader}>
       <Text style={styles.sectionTitle}>{title}</Text>
       {action && (
-        <Text style={styles.sectionAction} onPress={onAction}>{action}</Text>
+        <TouchableOpacity onPress={onAction} activeOpacity={0.6}>
+          <Text style={styles.sectionAction}>{action}</Text>
+        </TouchableOpacity>
       )}
     </View>
   );
@@ -109,34 +122,59 @@ export function ProgressBar({ progress, color = Colors.primary, height = 6 }: Pr
   );
 }
 
+interface GradientButtonProps {
+  title: string;
+  onPress: () => void;
+  style?: StyleProp<ViewStyle>;
+  disabled?: boolean;
+  icon?: string;
+}
+
+export function GradientButton({ title, onPress, style, disabled, icon }: GradientButtonProps) {
+  return (
+    <TouchableOpacity
+      style={[styles.gradientButton, disabled && styles.gradientButtonDisabled, Shadow.lg, style]}
+      onPress={onPress}
+      activeOpacity={0.85}
+      disabled={disabled}
+    >
+      {icon && <Text style={styles.gradientButtonIcon}>{icon}</Text>}
+      <Text style={styles.gradientButtonText}>{title}</Text>
+    </TouchableOpacity>
+  );
+}
+
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.card,
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
     borderColor: Colors.border,
   },
+  cardHighlight: {
+    borderColor: Colors.primary + '40',
+    backgroundColor: Colors.surfaceLight,
+  },
   badge: {
     paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.xs,
-    borderRadius: BorderRadius.sm,
+    paddingVertical: Spacing.xxs,
+    borderRadius: BorderRadius.full,
     alignSelf: 'flex-start',
   },
   badgeMd: {
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
+    paddingVertical: Spacing.xs,
   },
   badgeText: {
     fontSize: FontSize.xs,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    fontWeight: '700',
+    letterSpacing: 0.8,
   },
   badgeTextMd: {
     fontSize: FontSize.sm,
   },
   statCard: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.card,
     borderRadius: BorderRadius.lg,
     padding: Spacing.md,
     borderLeftWidth: 3,
@@ -163,31 +201,44 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xs,
     color: Colors.textSecondary,
     marginTop: 2,
+    letterSpacing: 0.3,
   },
   statTrend: {
     fontSize: FontSize.xs,
-    fontWeight: '600',
+    fontWeight: '500',
     marginTop: Spacing.xs,
   },
   emptyState: {
     alignItems: 'center',
-    paddingVertical: Spacing.xxxl,
+    paddingVertical: Spacing.xxl,
+  },
+  emptyIconContainer: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: Colors.surfaceLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   emptyIcon: {
-    fontSize: 48,
-    marginBottom: Spacing.md,
-    opacity: 0.5,
+    fontSize: 32,
+    opacity: 0.6,
   },
   emptyTitle: {
     fontSize: FontSize.lg,
     fontWeight: '600',
-    color: Colors.text,
+    color: Colors.textSecondary,
     marginBottom: Spacing.xs,
   },
   emptyDesc: {
     fontSize: FontSize.sm,
     color: Colors.textMuted,
     textAlign: 'center',
+    paddingHorizontal: Spacing.xl,
+    lineHeight: 20,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -199,11 +250,12 @@ const styles = StyleSheet.create({
     fontSize: FontSize.lg,
     fontWeight: 'bold',
     color: Colors.text,
+    letterSpacing: -0.3,
   },
   sectionAction: {
     fontSize: FontSize.sm,
     color: Colors.primary,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   progressTrack: {
     width: '100%',
@@ -213,5 +265,28 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     borderRadius: 3,
+  },
+  gradientButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.primary,
+    borderRadius: BorderRadius.md,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    gap: Spacing.sm,
+  },
+  gradientButtonDisabled: {
+    opacity: 0.5,
+  },
+  gradientButtonIcon: {
+    fontSize: FontSize.lg,
+    color: Colors.white,
+  },
+  gradientButtonText: {
+    color: Colors.white,
+    fontSize: FontSize.md,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
 });

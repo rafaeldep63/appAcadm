@@ -16,7 +16,7 @@ const { width } = Dimensions.get('window');
 
 export default function ProgressScreen({ customNavigation }: any) {
   const { students, workoutHistory, studentMeasurements } = useData();
-  const { user } = useAuth();
+  const { currentUser: user } = useAuth();
   const activeStudents = students.filter((s) => s.status === 'ativo').length;
   const myMeasurements = studentMeasurements[user?.id || ''] || [];
 

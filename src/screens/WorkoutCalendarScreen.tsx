@@ -24,7 +24,7 @@ const days = [
 export default function WorkoutCalendarScreen() {
   const [selectedDay, setSelectedDay] = useState('Segunda');
   const { workouts, isWorkoutComplete, toggleWorkoutComplete } = useData();
-  const { user } = useAuth();
+  const { currentUser: user } = useAuth();
   const myWorkouts = user?.role === 'admin' ? workouts : workouts.filter((w) => w.assignedTo === user?.id);
 
   const dayWorkouts = myWorkouts.filter((w) => w.day === selectedDay);

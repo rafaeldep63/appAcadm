@@ -26,7 +26,7 @@ export default function AddMeasurementScreen({ onBack }: Props) {
   const [thighs, setThighs] = useState('');
   const [notes, setNotes] = useState('');
   const { addMeasurement } = useData();
-  const { user } = useAuth();
+  const { currentUser: user } = useAuth();
 
   const handleSave = () => {
     if (!weight) {

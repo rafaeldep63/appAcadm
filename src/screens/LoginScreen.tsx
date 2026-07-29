@@ -11,7 +11,8 @@ import {
   Dimensions,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
+import { Colors, Spacing, BorderRadius, FontSize, Shadow } from '../theme';
+import { GradientButton } from '../components/UI';
 
 const { width, height } = Dimensions.get('window');
 
@@ -21,12 +22,12 @@ export default function LoginScreen({ navigation }: any) {
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Atencao', 'Preencha todos os campos para continuar.');
       return;
     }
-    const success = login(email, password);
+    const success = await login(email, password);
     if (!success) {
       Alert.alert('Erro', 'Email ou senha incorretos.');
     }
@@ -96,10 +97,7 @@ export default function LoginScreen({ navigation }: any) {
             <Text style={styles.forgotText}>Esqueceu a senha?</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.loginButtonText}>Entrar</Text>
-            <Text style={styles.loginButtonArrow}>→</Text>
-          </TouchableOpacity>
+          <GradientButton title="Entrar" onPress={handleLogin} icon="→" style={{ marginTop: Spacing.md }} />
 
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
@@ -119,13 +117,13 @@ export default function LoginScreen({ navigation }: any) {
               <View style={styles.demoHintAccount}>
                 <Text style={styles.demoHintRole}>Admin</Text>
                 <Text style={styles.demoHintText}>admin@academia.com</Text>
-                <Text style={styles.demoHintText}>Senha: 123456</Text>
+                <Text style={styles.demoHintText}>Senha: 123</Text>
               </View>
               <View style={styles.demoHintDivider} />
               <View style={styles.demoHintAccount}>
                 <Text style={styles.demoHintRole}>Aluno</Text>
                 <Text style={styles.demoHintText}>joao@email.com</Text>
-                <Text style={styles.demoHintText}>Senha: 123456</Text>
+                <Text style={styles.demoHintText}>Senha: 123</Text>
               </View>
             </View>
           </View>

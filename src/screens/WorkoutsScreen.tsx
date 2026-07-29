@@ -19,7 +19,7 @@ export default function WorkoutsScreen({ customNavigation }: any) {
   const [dayFilter, setDayFilter] = useState<string | null>(null);
   const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
   const { workouts, deleteWorkout } = useData();
-  const { user } = useAuth();
+  const { currentUser: user } = useAuth();
   const myWorkouts = user?.role === 'admin' ? workouts : workouts.filter((w) => w.assignedTo === user?.id);
 
   const days = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'];
@@ -104,6 +104,15 @@ export default function WorkoutsScreen({ customNavigation }: any) {
             }}
           >
             <Text style={styles.startWorkoutText}>Iniciar Treino</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.editWorkoutButton}
+            onPress={() => {
+              setSelectedWorkout(null);
+              customNavigation?.navigate('EditWorkout', { workout: selectedWorkout });
+            }}
+          >
+            <Text style={styles.editWorkoutText}>Editar</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.deleteWorkoutButton}
@@ -266,6 +275,11 @@ const styles = StyleSheet.create({
     alignItems: 'center', shadowColor: Colors.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6,
   },
   startWorkoutText: { color: Colors.white, fontSize: FontSize.md, fontWeight: '600' },
+  editWorkoutButton: {
+    borderWidth: 1, borderColor: Colors.primary, borderRadius: BorderRadius.md,
+    paddingVertical: Spacing.md, alignItems: 'center',
+  },
+  editWorkoutText: { color: Colors.primary, fontSize: FontSize.md, fontWeight: '500' },
   deleteWorkoutButton: {
     borderWidth: 1, borderColor: Colors.danger, borderRadius: BorderRadius.md,
     paddingVertical: Spacing.md, alignItems: 'center',

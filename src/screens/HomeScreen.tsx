@@ -7,9 +7,9 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
+import { Colors, Spacing, BorderRadius, FontSize, Shadow } from '../theme';
 import { useData } from '../context/DataContext';
-import { Card, Badge } from '../components/UI';
+import { Card, Badge, SectionHeader } from '../components/UI';
 
 const { width } = Dimensions.get('window');
 
@@ -17,7 +17,8 @@ export default function HomeScreen({ navigation }: any) {
   const { workouts, students, isWorkoutComplete, workoutHistory } = useData();
   const activeStudents = students.filter((s) => s.status === 'ativo').length;
 
-  const today: string = 'Segunda';
+  const daysOrder = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'];
+  const today: string = daysOrder[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
   const todayWorkouts = workouts.filter((w) => w.day === today);
   const todayDone = todayWorkouts.filter((w) => isWorkoutComplete(w.id, w.day)).length;
   const totalExercises = workouts.reduce((acc, w) => acc + w.exercises.length, 0);
@@ -29,10 +30,10 @@ export default function HomeScreen({ navigation }: any) {
   }).length;
 
   const stats = [
-    { icon: '●', value: String(activeStudents), label: 'Alunos Ativos', color: Colors.success, trend: `${students.length} total` },
+    { icon: '●', value: String(activeStudents), label: 'Alunos Ativos', color: Colors.success, trend: `${students.length} cadastrados` },
     { icon: '◈', value: String(workouts.length), label: 'Treinos', color: Colors.primary, trend: `${totalExercises} exercicios` },
-    { icon: '◉', value: String(monthlyWorkouts), label: 'Treinos no Mes', color: Colors.info, trend: 'ultimos 30 dias' },
-    { icon: '♦', value: `${todayDone}/${todayWorkouts.length}`, label: 'Concluidos Hoje', color: Colors.warning, trend: today },
+    { icon: '◆', value: String(monthlyWorkouts), label: 'Treinos no Mes', color: Colors.info, trend: 'ultimos 30 dias' },
+    { icon: '◎', value: `${todayDone}/${todayWorkouts.length}`, label: 'Concluidos Hoje', color: Colors.warning, trend: today },
   ];
 
   return (
@@ -55,28 +56,22 @@ export default function HomeScreen({ navigation }: any) {
 
       <View style={styles.statsGrid}>
         {stats.map((stat, index) => (
-          <View key={index} style={[styles.statCard, { borderLeftColor: stat.color }]}>
+          <View key={index} style={[styles.statCard, { borderLeftColor: stat.color }, Shadow.sm]}>
             <View style={[styles.statIconContainer, { backgroundColor: stat.color + '20' }]}>
               <Text style={[styles.statIcon, { color: stat.color }]}>{stat.icon}</Text>
             </View>
             <Text style={styles.statValue}>{stat.value}</Text>
             <Text style={styles.statLabel}>{stat.label}</Text>
-            <Text style={[styles.statTrend, { color: stat.color }]}>{stat.trend}</Text>
           </View>
         ))}
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Treinos de Hoje</Text>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionSubtitle}>{todayWorkouts.length} treino(s) agendados</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Calendario')}>
-            <Text style={styles.seeAll}>Ver todos</Text>
-          </TouchableOpacity>
-        </View>
+        <SectionHeader title="Treinos de Hoje" action="Ver todos" onAction={() => navigation.navigate('Calendario')} />
         {todayWorkouts.length === 0 ? (
           <Card>
             <Text style={styles.emptyText}>Nenhum treino agendado para hoje</Text>
+            <Text style={styles.emptyHint}>Va em Treinos para criar um novo treino</Text>
           </Card>
         ) : (
           todayWorkouts.map((workout) => {
@@ -106,17 +101,17 @@ export default function HomeScreen({ navigation }: any) {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Atalhos Rapidos</Text>
+        <SectionHeader title="Atalhos Rapidos" />
         <View style={styles.shortcutsGrid}>
           {[
             { label: 'Treinos', icon: '◈', screen: 'Treinos', color: Colors.primary, count: workouts.length },
             { label: 'Calendario', icon: '◎', screen: 'Calendario', color: Colors.info, count: `${todayDone}/${todayWorkouts.length}` },
-            { label: 'Alunos', icon: '◉', screen: 'Alunos', color: Colors.success, count: activeStudents },
+            { label: 'Alunos', icon: '●', screen: 'Alunos', color: Colors.success, count: activeStudents },
             { label: 'Progresso', icon: '◆', screen: 'Progresso', color: Colors.warning, count: `${monthlyWorkouts} mes` },
           ].map((shortcut, index) => (
             <TouchableOpacity
               key={index}
-              style={styles.shortcutCard}
+              style={[styles.shortcutCard, Shadow.sm]}
               onPress={() => navigation.navigate(shortcut.screen)}
               activeOpacity={0.7}
             >
@@ -131,16 +126,19 @@ export default function HomeScreen({ navigation }: any) {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Ultimos Treinos</Text>
+        <SectionHeader title="Ultimos Treinos" />
         {workoutHistory.length === 0 ? (
           <Card>
             <Text style={styles.emptyText}>Nenhum treino realizado ainda</Text>
+            <Text style={styles.emptyHint}>Complete um treino para ve-lo aqui</Text>
           </Card>
         ) : (
           workoutHistory.slice(0, 3).map((entry) => (
             <Card key={entry.id} style={styles.historyCard}>
               <View style={styles.historyRow}>
-                <Text style={styles.historyIcon}>◈</Text>
+                <View style={styles.historyIconContainer}>
+                  <Text style={styles.historyIcon}>✓</Text>
+                </View>
                 <View style={styles.historyInfo}>
                   <Text style={styles.historyName}>{entry.workoutName}</Text>
                   <Text style={styles.historyDate}>{entry.date} • {entry.duration}min</Text>
@@ -195,7 +193,8 @@ const styles = StyleSheet.create({
   },
   sectionSubtitle: { fontSize: FontSize.sm, color: Colors.textSecondary },
   seeAll: { fontSize: FontSize.sm, color: Colors.primary, fontWeight: '500' },
-  emptyText: { fontSize: FontSize.sm, color: Colors.textMuted, textAlign: 'center', paddingVertical: Spacing.lg },
+  emptyText: { fontSize: FontSize.sm, color: Colors.textMuted, textAlign: 'center', paddingTop: Spacing.lg },
+  emptyHint: { fontSize: FontSize.xs, color: Colors.textMuted, textAlign: 'center', paddingBottom: Spacing.md, opacity: 0.7 },
   workoutCard: { marginBottom: Spacing.sm },
   workoutCardDone: { opacity: 0.7 },
   workoutRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
@@ -220,7 +219,11 @@ const styles = StyleSheet.create({
   shortcutCount: { fontSize: FontSize.sm, fontWeight: 'bold', marginTop: 4 },
   historyCard: { marginBottom: Spacing.sm },
   historyRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  historyIcon: { fontSize: 18, color: Colors.primary },
+  historyIconContainer: {
+    width: 36, height: 36, borderRadius: 10, backgroundColor: Colors.successBg,
+    justifyContent: 'center', alignItems: 'center',
+  },
+  historyIcon: { fontSize: 16, color: Colors.success, fontWeight: 'bold' },
   historyInfo: { flex: 1 },
   historyName: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.text },
   historyDate: { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: 2 },

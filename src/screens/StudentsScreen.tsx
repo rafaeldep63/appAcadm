@@ -11,7 +11,7 @@ import {
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
 import { useData } from '../context/DataContext';
 import { Student } from '../data/types';
-import { Card, Badge, EmptyState } from '../components/UI';
+import { Card, Badge, EmptyState, SectionHeader } from '../components/UI';
 
 export default function StudentsScreen({ navigation }: any) {
   const [search, setSearch] = useState('');

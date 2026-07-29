@@ -22,12 +22,12 @@ export default function RegisterScreen({ navigation }: any) {
   const [showPassword, setShowPassword] = useState(false);
   const { register } = useAuth();
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!nome || !email || !password) {
       Alert.alert('Atencao', 'Preencha todos os campos para continuar.');
       return;
     }
-    const success = register(nome, email, password);
+    const success = await register(nome, email, password);
     if (!success) {
       Alert.alert('Erro', 'Nao foi possivel criar a conta.');
     }

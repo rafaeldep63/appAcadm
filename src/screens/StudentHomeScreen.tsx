@@ -10,12 +10,13 @@ import {
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
+import { Workout } from '../data/types';
 import { Card, Badge, SectionHeader, ProgressBar } from '../components/UI';
 
 const { width } = Dimensions.get('window');
 
 export default function StudentHomeScreen({ navigation, customNavigation }: any) {
-  const { user, logout } = useAuth();
+  const { currentUser: user, logout } = useAuth();
   const { workouts, isWorkoutComplete, workoutHistory } = useData();
 
   const myWorkouts = workouts.filter((w) => w.assignedTo === user?.id);
@@ -29,7 +30,7 @@ export default function StudentHomeScreen({ navigation, customNavigation }: any)
   const nextWorkout = isTodayDone
     ? daysOrder.slice(daysOrder.indexOf(today) + 1).reduce((found, day) => {
         return found || myWorkouts.find((w) => w.day === day) || null;
-      }, null as any)
+      }, null as Workout | null)
     : null;
   const completedCount = workoutHistory.filter((h) => {
     const d = new Date(h.date.split('/').reverse().join('-'));
@@ -282,6 +283,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', paddingVertical: Spacing.sm,
     borderTopWidth: 1, borderTopColor: Colors.border, gap: Spacing.md,
   },
+  exerciseInfo: { flex: 1 },
   exerciseNumber: {
     width: 24, height: 24, borderRadius: 6, backgroundColor: Colors.background,
     justifyContent: 'center', alignItems: 'center',

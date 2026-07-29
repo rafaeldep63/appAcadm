@@ -18,15 +18,25 @@ import { Card, Badge } from '../components/UI';
 interface Props {
   onBack: () => void;
   onSave: (workout: any) => void;
+  workout?: Workout;
 }
 
-export default function AddWorkoutScreen({ onBack, onSave }: Props) {
+export default function AddWorkoutScreen({ onBack, onSave, workout }: Props) {
   const { students } = useData();
-  const { user, isAdmin } = useAuth();
-  const [name, setName] = useState('');
-  const [selectedDay, setSelectedDay] = useState('Segunda');
-  const [assignedTo, setAssignedTo] = useState(isAdmin ? (students[0]?.id || '') : (user?.id || ''));
-  const [selectedExercises, setSelectedExercises] = useState<{ exercise: Exercise; reps: string; weight: string; sets: string }[]>([]);
+  const { currentUser: user, isAdmin } = useAuth();
+  const [name, setName] = useState(workout?.name || '');
+  const [selectedDay, setSelectedDay] = useState(workout?.day || 'Segunda');
+  const [assignedTo, setAssignedTo] = useState(workout?.assignedTo || (isAdmin ? (students[0]?.id || '') : (user?.id || '')));
+  const [selectedExercises, setSelectedExercises] = useState<{ exercise: Exercise; reps: string; weight: string; sets: string }[]>(
+    workout
+      ? workout.exercises.map((we) => ({
+          exercise: we.exercise,
+          reps: String(we.sets[0]?.reps ?? 12),
+          weight: String(we.sets[0]?.weight ?? 0),
+          sets: String(we.sets.length),
+        }))
+      : []
+  );
 
   const days = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'];
 
@@ -62,7 +72,7 @@ export default function AddWorkoutScreen({ onBack, onSave }: Props) {
       return;
     }
     const newWorkout: Workout = {
-      id: Date.now().toString(),
+      id: workout?.id || Date.now().toString(),
       name,
       day: selectedDay,
       assignedTo,
@@ -84,7 +94,7 @@ export default function AddWorkoutScreen({ onBack, onSave }: Props) {
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
           <Text style={styles.backIcon}>‹</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Novo Treino</Text>
+        <Text style={styles.headerTitle}>{workout ? 'Editar Treino' : 'Novo Treino'}</Text>
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveText}>Salvar</Text>
         </TouchableOpacity>
