@@ -100,9 +100,8 @@ export default function WorkoutExecutionScreen({ workout, onFinish }: Props) {
             { text: 'Cancelar', style: 'cancel' },
             { text: 'Sair', style: 'destructive', onPress: onFinish },
           ]);
-        
-          <Text style={styles.closeIcon}>✕</Text>
-          }}>
+        }}>
+          <Text style={styles.closeIcon}>X</Text>
         </TouchableOpacity>
         <View style={styles.headerInfo}>
           <Text style={styles.headerTitle}>{workout.name}</Text>
