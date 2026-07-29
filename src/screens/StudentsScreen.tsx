@@ -21,7 +21,7 @@ export default function StudentsScreen({ navigation }: any) {
   const [formEmail, setFormEmail] = useState('');
   const [formPhone, setFormPhone] = useState('');
   const [formPlan, setFormPlan] = useState<'basico' | 'premium' | 'vip'>('basico');
-  const { students, addStudent, updateStudent } = useData();
+  const { students, addStudent, updateStudent, studentMeasurements } = useData();
 
   const filteredStudents = students.filter(
     (s) => s.name.toLowerCase().includes(search.toLowerCase()) || s.email.toLowerCase().includes(search.toLowerCase())
@@ -158,8 +158,35 @@ export default function StudentsScreen({ navigation }: any) {
               <Text style={styles.planLabel}>Vencimento</Text>
               <Text style={styles.planValue}>{selectedStudent.planEndDate}</Text>
             </View>
-          </View>
+</View>
         </Card>
+
+        <SectionHeader title="Medidas" />
+        {(() => {
+          const meas = studentMeasurements[selectedStudent.id] || [];
+          return meas.length === 0 ? (
+            <Card style={styles.measCard}>
+              <Text style={styles.measEmpty}>Nenhuma medida registrada</Text>
+            </Card>
+          ) : (
+            meas.slice(0, 3).map((m) => (
+              <Card key={m.id} style={styles.measCard}>
+                <View style={styles.measRow}>
+                  <Text style={styles.measDate}>{m.date}</Text>
+                  <Text style={styles.measWeight}>{m.weight}kg</Text>
+                </View>
+                <View style={styles.measTags}>
+                  {m.bodyFat && <Text style={styles.measTag}>Gordura: {m.bodyFat}%</Text>}
+                  {m.chest && <Text style={styles.measTag}>Peito: {m.chest}cm</Text>}
+                  {m.waist && <Text style={styles.measTag}>Cintura: {m.waist}cm</Text>}
+                  {m.arms && <Text style={styles.measTag}>Braco: {m.arms}cm</Text>}
+                  {m.thighs && <Text style={styles.measTag}>Coxa: {m.thighs}cm</Text>}
+                </View>
+              </Card>
+            ))
+          );
+        })()}
+
         <View style={styles.actionsGrid}>
           <TouchableOpacity style={[styles.actionCard, { backgroundColor: Colors.primary + '15' }]} activeOpacity={0.7}>
             <Text style={[styles.actionIcon, { color: Colors.primary }]}>✎</Text>
@@ -311,6 +338,13 @@ const styles = StyleSheet.create({
   },
   actionIcon: { fontSize: 24 },
   actionLabel: { fontSize: FontSize.sm, fontWeight: '600' },
+  measEmpty: { fontSize: FontSize.sm, color: Colors.textMuted, textAlign: 'center', paddingVertical: Spacing.md },
+  measCard: { marginBottom: Spacing.sm, paddingHorizontal: Spacing.lg },
+  measRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  measDate: { fontSize: FontSize.xs, color: Colors.textMuted },
+  measWeight: { fontSize: FontSize.md, fontWeight: 'bold', color: Colors.primary },
+  measTags: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.xs, marginTop: Spacing.sm },
+  measTag: { fontSize: FontSize.xs, color: Colors.textSecondary, backgroundColor: Colors.background, paddingHorizontal: Spacing.sm, paddingVertical: 2, borderRadius: 4, overflow: 'hidden' },
   fab: {
     position: 'absolute', bottom: Spacing.xl, right: Spacing.xl,
     width: 56, height: 56, borderRadius: 16, backgroundColor: Colors.primary,

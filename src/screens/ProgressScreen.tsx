@@ -9,13 +9,16 @@ import {
 } from 'react-native';
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
 import { useData } from '../context/DataContext';
+import { useAuth } from '../context/AuthContext';
 import { Card, SectionHeader, Badge, ProgressBar } from '../components/UI';
 
 const { width } = Dimensions.get('window');
 
 export default function ProgressScreen({ customNavigation }: any) {
-  const { students, workoutHistory } = useData();
+  const { students, workoutHistory, studentMeasurements } = useData();
+  const { user } = useAuth();
   const activeStudents = students.filter((s) => s.status === 'ativo').length;
+  const myMeasurements = studentMeasurements[user?.id || ''] || [];
 
   const totalWorkouts = workoutHistory.length;
   const monthWorkouts = workoutHistory.filter((h) => {
@@ -140,6 +143,36 @@ export default function ProgressScreen({ customNavigation }: any) {
         )}
       </View>
 
+      <View style={styles.section}>
+        <SectionHeader title="Minhas Medidas" />
+        {myMeasurements.length === 0 ? (
+          <Card>
+            <Text style={styles.emptyText}>Nenhuma medida registrada ainda</Text>
+          </Card>
+        ) : (
+          myMeasurements.slice(0, 5).map((m) => (
+            <Card key={m.id} style={styles.measCard}>
+              <View style={styles.measHeader}>
+                <View style={styles.measDateBlock}>
+                  <Text style={styles.measDay}>{m.date.split('/')[0]}</Text>
+                  <Text style={styles.measMonth}>{m.date.split('/')[1]}</Text>
+                </View>
+                <View style={styles.measValues}>
+                  <Text style={styles.measWeight}>{m.weight}kg</Text>
+                  {m.bodyFat && <Text style={styles.measFat}>{m.bodyFat}% gordura</Text>}
+                </View>
+              </View>
+              <View style={styles.measRow}>
+                {m.chest && <Text style={styles.measDetail}>Peito: {m.chest}cm</Text>}
+                {m.waist && <Text style={styles.measDetail}>Cintura: {m.waist}cm</Text>}
+                {m.arms && <Text style={styles.measDetail}>Braco: {m.arms}cm</Text>}
+                {m.thighs && <Text style={styles.measDetail}>Coxa: {m.thighs}cm</Text>}
+              </View>
+            </Card>
+          ))
+        )}
+      </View>
+
       <TouchableOpacity style={styles.addButton} activeOpacity={0.8} onPress={() => customNavigation?.navigate('AddMeasurement')}>
         <Text style={styles.addButtonText}>+ Registrar Medidas</Text>
       </TouchableOpacity>
@@ -196,6 +229,16 @@ const styles = StyleSheet.create({
   historyName: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.text },
   historyDuration: { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: 2 },
   emptyText: { fontSize: FontSize.sm, color: Colors.textMuted, textAlign: 'center', paddingVertical: Spacing.lg },
+  measCard: { marginBottom: Spacing.sm },
+  measHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, marginBottom: Spacing.sm },
+  measDateBlock: { alignItems: 'center', minWidth: 40 },
+  measDay: { fontSize: FontSize.lg, fontWeight: 'bold', color: Colors.primary },
+  measMonth: { fontSize: FontSize.xs, color: Colors.textMuted, textTransform: 'uppercase' },
+  measValues: { flex: 1 },
+  measWeight: { fontSize: FontSize.md, fontWeight: 'bold', color: Colors.text },
+  measFat: { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: 2 },
+  measRow: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm, borderTopWidth: 1, borderTopColor: Colors.border, paddingTop: Spacing.sm },
+  measDetail: { fontSize: FontSize.xs, color: Colors.textSecondary, backgroundColor: Colors.background, paddingHorizontal: Spacing.sm, paddingVertical: 2, borderRadius: 4, overflow: 'hidden' },
   addButton: {
     backgroundColor: Colors.primary, marginHorizontal: Spacing.lg, marginTop: Spacing.lg,
     borderRadius: BorderRadius.lg, paddingVertical: Spacing.md, alignItems: 'center',
