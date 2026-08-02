@@ -98,16 +98,6 @@ export default function LoginScreen({ navigation }: any) {
           </TouchableOpacity>
 
           <GradientButton title="Entrar" onPress={handleLogin} icon="→" style={{ marginTop: Spacing.md }} />
-
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>ou</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          <TouchableOpacity style={styles.registerButton} onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.registerText}>Criar nova conta</Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.footer}>
@@ -126,6 +116,7 @@ export default function LoginScreen({ navigation }: any) {
                 <Text style={styles.demoHintText}>Senha: 123</Text>
               </View>
             </View>
+            <Text style={styles.demoHintNote}>Seu acesso e criado pelo administrador da academia</Text>
           </View>
           <Text style={styles.footerText}>AcadApp v1.0</Text>
           <Text style={styles.footerText}>Powered by Rafael</Text>
@@ -266,56 +257,6 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontWeight: '500',
   },
-  loginButton: {
-    backgroundColor: Colors.primary,
-    borderRadius: BorderRadius.md,
-    paddingVertical: Spacing.md,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  loginButtonText: {
-    color: Colors.white,
-    fontSize: FontSize.lg,
-    fontWeight: 'bold',
-  },
-  loginButtonArrow: {
-    color: Colors.white,
-    fontSize: FontSize.lg,
-  },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: Spacing.lg,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: Colors.border,
-  },
-  dividerText: {
-    marginHorizontal: Spacing.md,
-    fontSize: FontSize.sm,
-    color: Colors.textMuted,
-  },
-  registerButton: {
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: BorderRadius.md,
-    paddingVertical: Spacing.md,
-    alignItems: 'center',
-  },
-  registerText: {
-    fontSize: FontSize.md,
-    color: Colors.textSecondary,
-    fontWeight: '500',
-  },
   footer: {
     alignItems: 'center',
     marginTop: Spacing.xxl,
@@ -362,6 +303,12 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xs,
     color: Colors.textSecondary,
     marginTop: 2,
+  },
+  demoHintNote: {
+    fontSize: FontSize.xs,
+    color: Colors.textMuted,
+    marginTop: Spacing.md,
+    textAlign: 'center',
   },
   footerText: {
     fontSize: FontSize.xs,

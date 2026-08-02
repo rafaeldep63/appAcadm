@@ -15,13 +15,14 @@ import { Card, SectionHeader, Badge, ProgressBar } from '../components/UI';
 const { width } = Dimensions.get('window');
 
 export default function ProgressScreen({ customNavigation }: any) {
-  const { students, workoutHistory, studentMeasurements } = useData();
+  const { students, workoutHistory, studentMeasurements, getHistoryFor } = useData();
   const { currentUser: user } = useAuth();
   const activeStudents = students.filter((s) => s.status === 'ativo').length;
   const myMeasurements = studentMeasurements[user?.id || ''] || [];
+  const scopeHistory = user?.role === 'admin' ? workoutHistory : getHistoryFor(user?.id || '');
 
-  const totalWorkouts = workoutHistory.length;
-  const monthWorkouts = workoutHistory.filter((h) => {
+  const totalWorkouts = scopeHistory.length;
+  const monthWorkouts = scopeHistory.filter((h) => {
     const d = new Date(h.date.split('/').reverse().join('-'));
     const now = new Date();
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
@@ -32,7 +33,7 @@ export default function ProgressScreen({ customNavigation }: any) {
   const weekDays = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB', 'DOM'];
   const weekCounts = weekDays.map((_, i) => {
     const dayName = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'][i];
-    return workoutHistory.filter((h) => {
+    return scopeHistory.filter((h) => {
       const d = new Date(h.date.split('/').reverse().join('-'));
       const now = new Date();
       const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -44,15 +45,15 @@ export default function ProgressScreen({ customNavigation }: any) {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <Text style={styles.title}>Progresso Geral</Text>
-        <Text style={styles.subtitle}>Visao geral da academia</Text>
+        <Text style={styles.title}>{user?.role === 'admin' ? 'Progresso Geral' : 'Meu Progresso'}</Text>
+        <Text style={styles.subtitle}>{user?.role === 'admin' ? 'Visao geral da academia' : 'Acompanhe sua evolucao'}</Text>
       </View>
 
       <View style={styles.statsRow}>
         <Card style={[styles.miniStat, { borderLeftColor: Colors.primary }]}>
-          <Text style={styles.miniStatLabel}>Alunos Ativos</Text>
-          <Text style={styles.miniStatValue}>{activeStudents}</Text>
-          <Text style={[styles.miniStatDiff, { color: Colors.primary }]}>{students.length} total</Text>
+          <Text style={styles.miniStatLabel}>{user?.role === 'admin' ? 'Alunos Ativos' : 'Treinos Totais'}</Text>
+          <Text style={styles.miniStatValue}>{user?.role === 'admin' ? activeStudents : totalWorkouts}</Text>
+          <Text style={[styles.miniStatDiff, { color: Colors.primary }]}>{user?.role === 'admin' ? `${students.length} total` : 'realizados'}</Text>
         </Card>
         <Card style={[styles.miniStat, { borderLeftColor: Colors.info }]}>
           <Text style={styles.miniStatLabel}>Treinos Mes</Text>
@@ -89,43 +90,45 @@ export default function ProgressScreen({ customNavigation }: any) {
         </Card>
       </View>
 
-      <View style={styles.section}>
-        <SectionHeader title="Ranking de Alunos" />
-        {students
-          .filter((s) => s.status === 'ativo')
-          .sort((a, b) => {
-            const aCount = workoutHistory.filter((h) => h.studentId === a.id).length;
-            const bCount = workoutHistory.filter((h) => h.studentId === b.id).length;
-            return bCount - aCount;
-          })
-          .slice(0, 5)
-          .map((student, index) => {
-            const count = workoutHistory.filter((h) => h.studentId === student.id).length;
-            return (
-              <Card key={student.id} style={styles.rankCard}>
-                <View style={styles.rankRow}>
-                  <View style={[styles.rankBadge, index === 0 && styles.rankGold, index === 1 && styles.rankSilver, index === 2 && styles.rankBronze]}>
-                    <Text style={styles.rankNumber}>{index + 1}</Text>
+      {user?.role === 'admin' && (
+        <View style={styles.section}>
+          <SectionHeader title="Ranking de Alunos" />
+          {students
+            .filter((s) => s.status === 'ativo')
+            .sort((a, b) => {
+              const aCount = workoutHistory.filter((h) => h.studentId === a.id).length;
+              const bCount = workoutHistory.filter((h) => h.studentId === b.id).length;
+              return bCount - aCount;
+            })
+            .slice(0, 5)
+            .map((student, index) => {
+              const count = workoutHistory.filter((h) => h.studentId === student.id).length;
+              return (
+                <Card key={student.id} style={styles.rankCard}>
+                  <View style={styles.rankRow}>
+                    <View style={[styles.rankBadge, index === 0 && styles.rankGold, index === 1 && styles.rankSilver, index === 2 && styles.rankBronze]}>
+                      <Text style={styles.rankNumber}>{index + 1}</Text>
+                    </View>
+                    <View style={styles.rankInfo}>
+                      <Text style={styles.rankName}>{student.name}</Text>
+                      <Text style={styles.rankPlan}>{student.plan}</Text>
+                    </View>
+                    <Text style={styles.rankCount}>{count} treinos</Text>
                   </View>
-                  <View style={styles.rankInfo}>
-                    <Text style={styles.rankName}>{student.name}</Text>
-                    <Text style={styles.rankPlan}>{student.plan}</Text>
-                  </View>
-                  <Text style={styles.rankCount}>{count} treinos</Text>
-                </View>
-              </Card>
-            );
-          })}
-      </View>
+                </Card>
+              );
+            })}
+        </View>
+      )}
 
       <View style={styles.section}>
         <SectionHeader title="Ultimos Treinos Realizados" />
-        {workoutHistory.length === 0 ? (
+        {scopeHistory.length === 0 ? (
           <Card>
             <Text style={styles.emptyText}>Nenhum treino realizado ainda</Text>
           </Card>
         ) : (
-          workoutHistory.slice(0, 5).map((entry) => (
+          scopeHistory.slice(0, 5).map((entry) => (
             <Card key={entry.id} style={styles.historyCard}>
               <View style={styles.historyRow}>
                 <View style={styles.historyDateBlock}>

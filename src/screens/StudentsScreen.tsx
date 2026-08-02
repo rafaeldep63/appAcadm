@@ -20,6 +20,7 @@ export default function StudentsScreen({ navigation }: any) {
   const [isEditing, setIsEditing] = useState(false);
   const [formName, setFormName] = useState('');
   const [formEmail, setFormEmail] = useState('');
+  const [formPassword, setFormPassword] = useState('');
   const [formPhone, setFormPhone] = useState('');
   const [formPlan, setFormPlan] = useState<'basico' | 'premium' | 'vip'>('basico');
   const { students, addStudent, updateStudent, studentMeasurements } = useData();
@@ -54,6 +55,7 @@ export default function StudentsScreen({ navigation }: any) {
         id: Date.now().toString(),
         name: formName,
         email: formEmail,
+        password: formPassword || '123',
         phone: formPhone,
         plan: formPlan,
         planStartDate: new Date().toLocaleDateString('pt-BR'),
@@ -67,6 +69,7 @@ export default function StudentsScreen({ navigation }: any) {
     setIsEditing(false);
     setFormName('');
     setFormEmail('');
+    setFormPassword('');
     setFormPhone('');
     setFormPlan('basico');
   };
@@ -90,6 +93,8 @@ export default function StudentsScreen({ navigation }: any) {
           <TextInput style={styles.formInput} value={formName} onChangeText={setFormName} placeholder="Nome completo" placeholderTextColor={Colors.textMuted} />
           <Text style={styles.formLabel}>EMAIL</Text>
           <TextInput style={styles.formInput} value={formEmail} onChangeText={setFormEmail} placeholder="email@provedor.com" placeholderTextColor={Colors.textMuted} keyboardType="email-address" autoCapitalize="none" />
+          <Text style={styles.formLabel}>SENHA DE ACESSO</Text>
+          <TextInput style={styles.formInput} value={formPassword} onChangeText={setFormPassword} placeholder="Senha usada pelo aluno para entrar" placeholderTextColor={Colors.textMuted} secureTextEntry autoCapitalize="none" />
           <Text style={styles.formLabel}>TELEFONE</Text>
           <TextInput style={styles.formInput} value={formPhone} onChangeText={setFormPhone} placeholder="(11) 99999-9999" placeholderTextColor={Colors.textMuted} keyboardType="phone-pad" />
           <Text style={styles.formLabel}>PLANO</Text>
@@ -202,6 +207,7 @@ export default function StudentsScreen({ navigation }: any) {
             onPress={() => {
               setFormName(selectedStudent.name);
               setFormEmail(selectedStudent.email);
+              setFormPassword(selectedStudent.password || '');
               setFormPhone(selectedStudent.phone || '');
               setFormPlan(selectedStudent.plan);
               setIsEditing(true);
@@ -300,6 +306,7 @@ export default function StudentsScreen({ navigation }: any) {
           setIsEditing(false);
           setFormName('');
           setFormEmail('');
+          setFormPassword('');
           setFormPhone('');
           setFormPlan('basico');
           setShowAddForm(true);

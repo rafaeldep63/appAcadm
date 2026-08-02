@@ -62,6 +62,7 @@ export interface Student {
   id: string;
   name: string;
   email: string;
+  password?: string;
   phone: string;
   plan: 'basico' | 'premium' | 'vip';
   planStartDate: string;

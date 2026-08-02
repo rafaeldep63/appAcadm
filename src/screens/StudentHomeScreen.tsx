@@ -17,9 +17,10 @@ const { width } = Dimensions.get('window');
 
 export default function StudentHomeScreen({ navigation, customNavigation }: any) {
   const { currentUser: user, logout } = useAuth();
-  const { workouts, isWorkoutComplete, workoutHistory } = useData();
+  const { workouts, isWorkoutComplete, workoutHistory, getHistoryFor } = useData();
 
   const myWorkouts = workouts.filter((w) => w.assignedTo === user?.id);
+  const myHistory = getHistoryFor(user?.id || '');
 
   const daysOrder = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'];
   const today: string = daysOrder[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
@@ -38,12 +39,12 @@ export default function StudentHomeScreen({ navigation, customNavigation }: any)
         }, null as Workout | null);
       })()
     : null;
-  const completedCount = workoutHistory.filter((h) => {
+  const completedCount = myHistory.filter((h) => {
     const d = new Date(h.date.split('/').reverse().join('-'));
     const now = new Date();
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   }).length;
-  const weekWorkouts = workoutHistory.filter((h) => {
+  const weekWorkouts = myHistory.filter((h) => {
     const d = new Date(h.date.split('/').reverse().join('-'));
     const now = new Date();
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -188,12 +189,12 @@ export default function StudentHomeScreen({ navigation, customNavigation }: any)
 
       <View style={styles.section}>
         <SectionHeader title="Ultimos Treinos" />
-        {workoutHistory.length === 0 ? (
+        {myHistory.length === 0 ? (
           <Card>
             <Text style={styles.noWorkoutText}>Nenhum treino realizado ainda</Text>
           </Card>
         ) : (
-          workoutHistory.slice(0, 5).map((entry) => (
+          myHistory.slice(0, 5).map((entry) => (
             <Card key={entry.id} style={styles.historyCard}>
               <View style={styles.historyRow}>
                 <View style={styles.historyIconCircle}>

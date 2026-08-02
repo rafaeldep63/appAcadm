@@ -9,7 +9,6 @@ import { DataProvider } from './src/context/DataContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import StudentNavigator from './src/navigation/StudentNavigator';
 import LoginScreen from './src/screens/LoginScreen';
-import RegisterScreen from './src/screens/RegisterScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,10 +18,7 @@ function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {!user ? (
-        <>
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Register" component={RegisterScreen} />
-        </>
+        <Stack.Screen name="Login" component={LoginScreen} />
       ) : isAdmin ? (
         <Stack.Screen name="Admin" component={AppNavigator} />
       ) : (
@@ -41,13 +37,13 @@ export default function App() {
   }, []);
 
   return (
-    <AuthProvider>
-      <DataProvider>
+    <DataProvider>
+      <AuthProvider>
         <NavigationContainer>
           <StatusBar style="light" />
           <RootNavigator />
         </NavigationContainer>
-      </DataProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </DataProvider>
   );
 }

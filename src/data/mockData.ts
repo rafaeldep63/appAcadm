@@ -98,11 +98,11 @@ export const mockWorkouts: Workout[] = [
 ];
 
 export const mockStudents: Student[] = [
-  { id: '2', name: 'Joao Silva', email: 'joao@email.com', phone: '(31) 99999-0001', plan: 'vip', planStartDate: '01/01/2026', planEndDate: '31/12/2026', status: 'ativo' },
-  { id: 's3', name: 'Maria Santos', email: 'maria@email.com', phone: '(31) 99999-0002', plan: 'premium', planStartDate: '01/03/2026', planEndDate: '01/09/2026', status: 'ativo' },
-  { id: 's4', name: 'Carlos Oliveira', email: 'carlos@email.com', phone: '(31) 99999-0003', plan: 'basico', planStartDate: '15/01/2026', planEndDate: '15/07/2026', status: 'ativo' },
-  { id: 's5', name: 'Ana Costa', email: 'ana@email.com', phone: '(31) 99999-0004', plan: 'vip', planStartDate: '01/02/2026', planEndDate: '01/02/2027', status: 'ativo' },
-  { id: 's6', name: 'Pedro Almeida', email: 'pedro@email.com', phone: '(31) 99999-0005', plan: 'premium', planStartDate: '01/04/2026', planEndDate: '01/10/2026', status: 'inativo' },
+  { id: '2', name: 'Joao Silva', email: 'joao@email.com', password: '123', phone: '(31) 99999-0001', plan: 'vip', planStartDate: '01/01/2026', planEndDate: '31/12/2026', status: 'ativo' },
+  { id: 's3', name: 'Maria Santos', email: 'maria@email.com', password: '123', phone: '(31) 99999-0002', plan: 'premium', planStartDate: '01/03/2026', planEndDate: '01/09/2026', status: 'ativo' },
+  { id: 's4', name: 'Carlos Oliveira', email: 'carlos@email.com', password: '123', phone: '(31) 99999-0003', plan: 'basico', planStartDate: '15/01/2026', planEndDate: '15/07/2026', status: 'ativo' },
+  { id: 's5', name: 'Ana Costa', email: 'ana@email.com', password: '123', phone: '(31) 99999-0004', plan: 'vip', planStartDate: '01/02/2026', planEndDate: '01/02/2027', status: 'ativo' },
+  { id: 's6', name: 'Pedro Almeida', email: 'pedro@email.com', password: '123', phone: '(31) 99999-0005', plan: 'premium', planStartDate: '01/04/2026', planEndDate: '01/10/2026', status: 'inativo' },
 ];
 
 export const mockClasses: GymClass[] = [];

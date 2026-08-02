@@ -18,6 +18,7 @@ interface DataContextType {
   addWorkoutHistory: (entry: WorkoutHistory) => void;
   studentMeasurements: Record<string, Measurement[]>;
   addMeasurement: (studentId: string, measurement: Measurement) => void;
+  getHistoryFor: (studentId: string) => WorkoutHistory[];
 }
 
 export interface WorkoutHistory {
@@ -30,7 +31,7 @@ export interface WorkoutHistory {
   completed: boolean;
 }
 
-const STORAGE_VERSION = 2;
+const STORAGE_VERSION = 3;
 const STORAGE_KEYS = {
   version: '@appAcadm_version',
   workouts: '@appAcadm_workouts',
@@ -159,6 +160,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  const getHistoryFor = useCallback((studentId: string) => {
+    return workoutHistory.filter((h) => h.studentId === studentId);
+  }, [workoutHistory]);
+
   return (
     <DataContext.Provider value={{
       workouts, addWorkout, updateWorkout, deleteWorkout,
@@ -166,6 +171,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       completedWorkouts, toggleWorkoutComplete, isWorkoutComplete,
       workoutHistory, addWorkoutHistory,
       studentMeasurements, addMeasurement,
+      getHistoryFor,
     }}>
       {loaded ? children : null}
     </DataContext.Provider>
