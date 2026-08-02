@@ -24,7 +24,7 @@ export default function HomeScreen({ navigation }: any) {
   const totalExercises = workouts.reduce((acc, w) => acc + w.exercises.length, 0);
   const totalSets = workouts.reduce((acc, w) => acc + w.exercises.reduce((a, e) => a + e.sets.length, 0), 0);
   const monthlyWorkouts = workoutHistory.filter((h) => {
-    const d = new Date(h.date);
+    const d = new Date(h.date.split('/').reverse().join('-'));
     const now = new Date();
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   }).length;
@@ -40,7 +40,9 @@ export default function HomeScreen({ navigation }: any) {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>Bom dia,</Text>
+          <Text style={styles.greeting}>
+            {new Date().getHours() < 12 ? 'Bom dia,' : new Date().getHours() < 18 ? 'Boa tarde,' : 'Boa noite,'}
+          </Text>
           <Text style={styles.userName}>Administrador</Text>
         </View>
         <View style={styles.headerRight}>

@@ -17,6 +17,7 @@ export default function StudentsScreen({ navigation }: any) {
   const [search, setSearch] = useState('');
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [formName, setFormName] = useState('');
   const [formEmail, setFormEmail] = useState('');
   const [formPhone, setFormPhone] = useState('');
@@ -39,28 +40,35 @@ export default function StudentsScreen({ navigation }: any) {
     vip: { label: 'VIP', color: Colors.warning },
   };
 
-  const handleAddStudent = () => {
+  const handleSaveStudent = () => {
     if (!formName || !formEmail) {
       Alert.alert('Erro', 'Preencha nome e email.');
       return;
     }
-    const newStudent: Student = {
-      id: Date.now().toString(),
-      name: formName,
-      email: formEmail,
-      phone: formPhone,
-      plan: formPlan,
-      planStartDate: new Date().toISOString().split('T')[0],
-      planEndDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-      status: 'ativo',
-    };
-    addStudent(newStudent);
+    if (isEditing && selectedStudent) {
+      updateStudent(selectedStudent.id, { name: formName, email: formEmail, phone: formPhone, plan: formPlan });
+      setSelectedStudent({ ...selectedStudent, name: formName, email: formEmail, phone: formPhone, plan: formPlan });
+      Alert.alert('Sucesso', 'Aluno atualizado!');
+    } else {
+      const newStudent: Student = {
+        id: Date.now().toString(),
+        name: formName,
+        email: formEmail,
+        phone: formPhone,
+        plan: formPlan,
+        planStartDate: new Date().toLocaleDateString('pt-BR'),
+        planEndDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toLocaleDateString('pt-BR'),
+        status: 'ativo',
+      };
+      addStudent(newStudent);
+      Alert.alert('Sucesso', 'Aluno cadastrado com sucesso!');
+    }
     setShowAddForm(false);
+    setIsEditing(false);
     setFormName('');
     setFormEmail('');
     setFormPhone('');
     setFormPlan('basico');
-    Alert.alert('Sucesso', 'Aluno cadastrado com sucesso!');
   };
 
   const toggleStatus = (student: Student) => {
@@ -75,7 +83,7 @@ export default function StudentsScreen({ navigation }: any) {
           <TouchableOpacity style={styles.backButton} onPress={() => setShowAddForm(false)}>
             <Text style={styles.backIcon}>‹</Text>
           </TouchableOpacity>
-          <Text style={styles.title}>Novo Aluno</Text>
+          <Text style={styles.title}>{isEditing ? 'Editar Aluno' : 'Novo Aluno'}</Text>
         </View>
         <View style={styles.formContainer}>
           <Text style={styles.formLabel}>NOME</Text>
@@ -98,8 +106,8 @@ export default function StudentsScreen({ navigation }: any) {
               </TouchableOpacity>
             ))}
           </View>
-          <TouchableOpacity style={styles.saveButton} onPress={handleAddStudent}>
-            <Text style={styles.saveButtonText}>Cadastrar Aluno</Text>
+          <TouchableOpacity style={styles.saveButton} onPress={handleSaveStudent}>
+            <Text style={styles.saveButtonText}>{isEditing ? 'Salvar Alteracoes' : 'Cadastrar Aluno'}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -188,7 +196,18 @@ export default function StudentsScreen({ navigation }: any) {
         })()}
 
         <View style={styles.actionsGrid}>
-          <TouchableOpacity style={[styles.actionCard, { backgroundColor: Colors.primary + '15' }]} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={[styles.actionCard, { backgroundColor: Colors.primary + '15' }]}
+            activeOpacity={0.7}
+            onPress={() => {
+              setFormName(selectedStudent.name);
+              setFormEmail(selectedStudent.email);
+              setFormPhone(selectedStudent.phone || '');
+              setFormPlan(selectedStudent.plan);
+              setIsEditing(true);
+              setShowAddForm(true);
+            }}
+          >
             <Text style={[styles.actionIcon, { color: Colors.primary }]}>✎</Text>
             <Text style={[styles.actionLabel, { color: Colors.primary }]}>Editar</Text>
           </TouchableOpacity>
@@ -196,7 +215,7 @@ export default function StudentsScreen({ navigation }: any) {
             <Text style={[styles.actionIcon, { color: Colors.success }]}>◈</Text>
             <Text style={[styles.actionLabel, { color: Colors.success }]}>Treinos</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.actionCard, { backgroundColor: Colors.info + '15' }]} activeOpacity={0.7}>
+          <TouchableOpacity style={[styles.actionCard, { backgroundColor: Colors.info + '15' }]} activeOpacity={0.7} onPress={() => navigation?.navigate('Progresso')}>
             <Text style={[styles.actionIcon, { color: Colors.info }]}>◆</Text>
             <Text style={[styles.actionLabel, { color: Colors.info }]}>Progresso</Text>
           </TouchableOpacity>
@@ -274,7 +293,18 @@ export default function StudentsScreen({ navigation }: any) {
           })
         )}
       </ScrollView>
-      <TouchableOpacity style={styles.fab} activeOpacity={0.8} onPress={() => setShowAddForm(true)}>
+      <TouchableOpacity
+        style={styles.fab}
+        activeOpacity={0.8}
+        onPress={() => {
+          setIsEditing(false);
+          setFormName('');
+          setFormEmail('');
+          setFormPhone('');
+          setFormPlan('basico');
+          setShowAddForm(true);
+        }}
+      >
         <Text style={styles.fabIcon}>+</Text>
       </TouchableOpacity>
     </View>

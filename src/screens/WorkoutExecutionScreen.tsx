@@ -48,6 +48,7 @@ export default function WorkoutExecutionScreen({ workout, onFinish }: Props) {
   const totalSets = workout.exercises.reduce((acc, we) => acc + we.sets.length, 0);
   const completedCount = completedSets.flat().filter(Boolean).length;
   const progress = (completedCount / totalSets) * 100;
+  const canSkip = exercise && (currentSet < exercise.sets.length - 1 || currentExercise < workout.exercises.length - 1);
 
   const handleCompleteSet = () => {
     setIsRunning(false);
@@ -198,9 +199,11 @@ export default function WorkoutExecutionScreen({ workout, onFinish }: Props) {
 
       {exercise && (
         <View style={styles.bottomBar}>
-          <TouchableOpacity style={styles.skipButton} onPress={handleSkipSet}>
-            <Text style={styles.skipText}>Pular</Text>
-          </TouchableOpacity>
+          {canSkip && (
+            <TouchableOpacity style={styles.skipButton} onPress={handleSkipSet}>
+              <Text style={styles.skipText}>Pular</Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity style={styles.mainButton} onPress={handleCompleteSet}>
             <Text style={styles.mainButtonText}>
               {currentSet < exercise.sets.length - 1

@@ -8,13 +8,22 @@
     "splash": {
       "backgroundColor": "#1a1a2e"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "package": "com.rafael.acadapp",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#1a1a2e"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e7db7a97-8041-4d13-baea-86b6b3348a96"
       }
     }
   }

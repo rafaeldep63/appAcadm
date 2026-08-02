@@ -25,15 +25,16 @@ export default function AddMeasurementScreen({ onBack }: Props) {
   const [arms, setArms] = useState('');
   const [thighs, setThighs] = useState('');
   const [notes, setNotes] = useState('');
-  const { addMeasurement } = useData();
-  const { currentUser: user } = useAuth();
+  const { addMeasurement, students } = useData();
+  const { currentUser: user, isAdmin } = useAuth();
+  const [selectedStudentId, setSelectedStudentId] = useState(students[0]?.id || '');
 
   const handleSave = () => {
     if (!weight) {
       Alert.alert('Erro', 'Preencha pelo menos o peso.');
       return;
     }
-    addMeasurement(user?.id || 'anonymous', {
+    addMeasurement(isAdmin ? selectedStudentId || 'anonymous' : user?.id || 'anonymous', {
       id: Date.now().toString(),
       date: new Date().toLocaleDateString('pt-BR'),
       weight: parseFloat(weight),
@@ -74,14 +75,37 @@ export default function AddMeasurementScreen({ onBack }: Props) {
         <Card style={styles.userCard}>
           <View style={styles.userRow}>
             <View style={styles.userAvatar}>
-              <Text style={styles.userAvatarText}>{user?.name?.charAt(0) || '?'}</Text>
+              <Text style={styles.userAvatarText}>
+                {isAdmin ? (students.find((s) => s.id === selectedStudentId)?.name?.charAt(0) || '?') : (user?.name?.charAt(0) || '?')}
+              </Text>
             </View>
             <View>
-              <Text style={styles.userName}>{user?.name || 'Usuario'}</Text>
+              <Text style={styles.userName}>
+                {isAdmin ? (students.find((s) => s.id === selectedStudentId)?.name || 'Selecione um aluno') : (user?.name || 'Usuario')}
+              </Text>
               <Text style={styles.userDate}>{new Date().toLocaleDateString('pt-BR')}</Text>
             </View>
           </View>
         </Card>
+
+        {isAdmin && (
+          <Card style={styles.userCard}>
+            <Text style={styles.notesLabel}>ALUNO</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.studentRow}>
+              {students.map((s) => (
+                <TouchableOpacity
+                  key={s.id}
+                  style={[styles.studentChip, selectedStudentId === s.id && styles.studentChipActive]}
+                  onPress={() => setSelectedStudentId(s.id)}
+                >
+                  <Text style={[styles.studentChipText, selectedStudentId === s.id && styles.studentChipTextActive]}>
+                    {s.name.split(' ')[0]}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </Card>
+        )}
         <View style={styles.fieldsGrid}>
           {fields.map((field, index) => (
             <Card key={index} style={styles.fieldCard}>
@@ -180,6 +204,14 @@ const styles = StyleSheet.create({
     padding: Spacing.md, fontSize: FontSize.sm, color: Colors.text, minHeight: 80, textAlignVertical: 'top',
   },
   userCard: { marginBottom: Spacing.md },
+  studentRow: { flexDirection: 'row', gap: Spacing.sm },
+  studentChip: {
+    paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm, borderRadius: BorderRadius.sm,
+    backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border,
+  },
+  studentChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
+  studentChipText: { fontSize: FontSize.sm, color: Colors.textSecondary, fontWeight: '500' },
+  studentChipTextActive: { color: Colors.white },
   userRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   userAvatar: {
     width: 44, height: 44, borderRadius: 12, backgroundColor: Colors.primary,

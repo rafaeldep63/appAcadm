@@ -4,7 +4,7 @@ import { User } from '../data/types';
 interface AuthContextType {
   currentUser: User | null;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
+  register: (name: string, email: string, password: string) => Promise<User | null>;
   logout: () => void;
   hasPermission: (resource: string, action: string) => boolean;
   isAdmin: boolean;
@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const validUsers = [
         { id: 'rafael', name: 'safadão', email:'rafaellindo', role: 'aluno' as const},
         { id: 'admin', name: 'Admin', email: 'admin@academia.com', role: 'admin' as const },
-        { id: 'joao', name: 'João Silva', email: 'joao@email.com', role: 'aluno' as const },
+        { id: '2', name: 'João Silva', email: 'joao@email.com', role: 'aluno' as const },
       ];
       
       const user = validUsers.find(u => u.email === email && password === '123');
@@ -36,8 +36,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (name: string, email: string, password: string): Promise<boolean> => {
-    if (!name || !email || !password) return false;
+  const register = async (name: string, email: string, password: string): Promise<User | null> => {
+    if (!name || !email || !password) return null;
     
     try {
       const newUser: User = {
@@ -48,9 +48,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
       
       setCurrentUser(newUser);
-      return true;
+      return newUser;
     } catch (error) {
-      return false;
+      return null;
     }
   };
 

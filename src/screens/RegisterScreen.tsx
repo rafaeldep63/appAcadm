@@ -11,6 +11,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
+import { useData } from '../context/DataContext';
 import { Colors, Spacing, BorderRadius, FontSize } from '../theme';
 
 const { width, height } = Dimensions.get('window');
@@ -21,16 +22,28 @@ export default function RegisterScreen({ navigation }: any) {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { register } = useAuth();
+  const { addStudent } = useData();
 
   const handleRegister = async () => {
     if (!nome || !email || !password) {
       Alert.alert('Atencao', 'Preencha todos os campos para continuar.');
       return;
     }
-    const success = await register(nome, email, password);
-    if (!success) {
+    const newUser = await register(nome, email, password);
+    if (!newUser) {
       Alert.alert('Erro', 'Nao foi possivel criar a conta.');
+      return;
     }
+    addStudent({
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      phone: '',
+      plan: 'basico',
+      planStartDate: new Date().toLocaleDateString('pt-BR'),
+      planEndDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toLocaleDateString('pt-BR'),
+      status: 'ativo',
+    });
   };
 
   return (

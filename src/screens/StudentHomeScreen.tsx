@@ -28,9 +28,15 @@ export default function StudentHomeScreen({ navigation, customNavigation }: any)
   const isTodayDone = todayWorkout ? isWorkoutComplete(todayWorkout.id, today) : false;
 
   const nextWorkout = isTodayDone
-    ? daysOrder.slice(daysOrder.indexOf(today) + 1).reduce((found, day) => {
-        return found || myWorkouts.find((w) => w.day === day) || null;
-      }, null as Workout | null)
+    ? (() => {
+        const afterToday = daysOrder.slice(daysOrder.indexOf(today) + 1).reduce((found, day) => {
+          return found || myWorkouts.find((w) => w.day === day) || null;
+        }, null as Workout | null);
+        if (afterToday) return afterToday;
+        return daysOrder.reduce((found, day) => {
+          return found || myWorkouts.find((w) => w.day === day) || null;
+        }, null as Workout | null);
+      })()
     : null;
   const completedCount = workoutHistory.filter((h) => {
     const d = new Date(h.date.split('/').reverse().join('-'));
