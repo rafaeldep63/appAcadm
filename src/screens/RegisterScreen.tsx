@@ -24,9 +24,26 @@ export default function RegisterScreen({ navigation }: any) {
   const { register } = useAuth();
   const { addStudent } = useData();
 
+  const passwordRules = [
+    { label: 'Pelo menos 8 caracteres', test: (p: string) => p.length >= 8 },
+    { label: 'Uma letra maiuscula', test: (p: string) => /[A-Z]/.test(p) },
+    { label: 'Um numero', test: (p: string) => /\d/.test(p) },
+    { label: 'Sem espacos', test: (p: string) => !/\s/.test(p) },
+  ];
+
+  const findPasswordError = () => {
+    const rule = passwordRules.find((r) => !r.test(password));
+    return rule ? rule.label : null;
+  };
+
   const handleRegister = async () => {
     if (!nome || !email || !password) {
       Alert.alert('Atencao', 'Preencha todos os campos para continuar.');
+      return;
+    }
+    const error = findPasswordError();
+    if (error) {
+      Alert.alert('Senha fraca', `A senha precisa ter: ${error.toLowerCase()}.`);
       return;
     }
     const newUser = await register(nome, email, password);
@@ -119,6 +136,23 @@ export default function RegisterScreen({ navigation }: any) {
                 <Text style={styles.eyeIcon}>{showPassword ? '◉' : '◎'}</Text>
               </TouchableOpacity>
             </View>
+            {password.length > 0 && (
+              <View style={styles.passwordHint}>
+                {passwordRules.map((rule) => {
+                  const ok = rule.test(password);
+                  return (
+                    <View key={rule.label} style={styles.passwordHintRow}>
+                      <Text style={[styles.passwordHintIcon, { color: ok ? Colors.success : Colors.textMuted }]}>
+                        {ok ? '✓' : '○'}
+                      </Text>
+                      <Text style={[styles.passwordHintText, { color: ok ? Colors.success : Colors.textMuted }]}>
+                        {rule.label}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </View>
+            )}
           </View>
 
           <TouchableOpacity style={styles.loginButton} onPress={handleRegister}>
@@ -266,6 +300,23 @@ const styles = StyleSheet.create({
   eyeIcon: {
     fontSize: 16,
     color: Colors.textMuted,
+  },
+  passwordHint: {
+    marginTop: Spacing.sm,
+    gap: Spacing.xxs,
+  },
+  passwordHintRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  passwordHintIcon: {
+    fontSize: 12,
+    width: 16,
+    textAlign: 'center',
+  },
+  passwordHintText: {
+    fontSize: FontSize.xs,
   },
   loginButton: {
     backgroundColor: Colors.primary,

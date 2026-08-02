@@ -148,11 +148,16 @@ export default function WorkoutExecutionScreen({ workout, onFinish }: Props) {
 
                 {isCurrent && (
                   <>
-                    {we.exercise.videoUrl && (
+                    {we.exercise.videoUrl ? (
                       <TouchableOpacity style={styles.videoButton} onPress={() => Linking.openURL(we.exercise.videoUrl!)}>
                         <Text style={styles.videoButtonIcon}>▶</Text>
                         <Text style={styles.videoButtonText}>Ver como fazer</Text>
                       </TouchableOpacity>
+                    ) : (
+                      <View style={styles.howToBox}>
+                        <Text style={styles.howToLabel}>COMO FAZER</Text>
+                        <Text style={styles.howToText}>{we.exercise.description}</Text>
+                      </View>
                     )}
                     <View style={styles.setsContainer}>
                       {we.sets.map((s, setIndex) => {
@@ -267,6 +272,12 @@ const styles = StyleSheet.create({
   },
   videoButtonIcon: { fontSize: 14, color: Colors.danger },
   videoButtonText: { fontSize: FontSize.sm, color: Colors.danger, fontWeight: '600' },
+  howToBox: {
+    backgroundColor: Colors.info + '15', borderRadius: BorderRadius.sm, padding: Spacing.sm,
+    marginTop: Spacing.sm, borderWidth: 1, borderColor: Colors.info + '30',
+  },
+  howToLabel: { fontSize: FontSize.xs, color: Colors.info, fontWeight: '700', letterSpacing: 0.5, marginBottom: 2 },
+  howToText: { fontSize: FontSize.sm, color: Colors.textSecondary, lineHeight: 18 },
   setsContainer: { marginTop: Spacing.md, gap: Spacing.sm },
   setItem: {
     flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.background,
