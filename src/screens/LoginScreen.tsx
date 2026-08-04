@@ -98,6 +98,19 @@ export default function LoginScreen({ navigation }: any) {
           </TouchableOpacity>
 
           <GradientButton title="Entrar" onPress={handleLogin} icon="→" style={{ marginTop: Spacing.md }} />
+<<<<<<< HEAD
+=======
+
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>ou</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <TouchableOpacity style={styles.registerButton} onPress={() => navigation.navigate('Register')}>
+            <Text style={styles.registerText}>Criar nova conta</Text>
+          </TouchableOpacity>
+>>>>>>> 55b2dae1c57559b8cf074f3110721f716d50f7ef
         </View>
 
         <View style={styles.footer}>
