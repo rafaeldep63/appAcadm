@@ -9,6 +9,6 @@ App de academia em React Native + Expo + TypeScript.
 React Native • Expo • TypeScript
 
 ## Meu plano com este repo
-1. Estudar o código tela por tela até explicar sem olhar
-2. Reescrever trechos com minhas próprias mãos
-3. Só então considerar como projeto de portfólio
+1. criar um app de treino pra aumentar meu portífolio
+2. implementar ele nas academia
+3. E por ultimo me aprofundar no assunto
