@@ -2,11 +2,6 @@
 
 App de academia em React Native + Expo + TypeScript.
 
-> ⚠️ **Aviso honesto:** este código foi gerado com ajuda de IA e estou
-> estudando para entender cada parte dele. Não é um projeto autoral
-> completo — é meu material de aprendizado. Se você é recrutador:
-> veja meus projetos autorais no meu perfil.
-
 ## Estado atual
 - 🚧 Em desenvolvimento / estudo — **não está em produção**
 
